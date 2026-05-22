@@ -1,0 +1,16 @@
+{
+  "name": "medicitas-sprint2",
+  "version": "2.0.0",
+  "description": "MediCitas — Prototipo funcional Sprint 2. Plataforma de reservas de citas médicas con persistencia en archivos planos JSON.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "author": "Equipo MediCitas",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

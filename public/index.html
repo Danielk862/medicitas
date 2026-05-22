@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MediCitas · Prototipo Funcional Sprint 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body class="hide-proto-bar">
+
+<!-- ============ CONTENEDOR DE TOASTS ============ -->
+<div class="toast-stack" id="toast-stack"></div>
+
+<!-- ============ MODAL GENÉRICO ============ -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Confirmar</h3>
+    <p id="modal-text">¿Estás seguro?</p>
+    <div class="modal__actions">
+      <button class="btn btn--secondary btn--lg" style="flex:1" id="modal-cancel">Cancelar</button>
+      <button class="btn btn--primary btn--lg" style="flex:1" id="modal-ok">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BARRA DE NAVEGACIÓN DEL PROTOTIPO ============ -->
+<nav class="proto-bar">
+  <div class="proto-bar__brand">
+    <span class="proto-bar__brand-dot"></span>
+    MediCitas <span class="proto-bar__label">· Funcional Sprint 2</span>
+  </div>
+  <div class="proto-bar__nav">
+    <button class="proto-bar__btn active" data-go="1"><span class="proto-bar__num">1</span>Landing</button>
+    <button class="proto-bar__btn" data-go="2"><span class="proto-bar__num">2</span>Registro</button>
+    <button class="proto-bar__btn" data-go="3"><span class="proto-bar__num">3</span>Login</button>
+    <button class="proto-bar__btn" data-go="4"><span class="proto-bar__num">4</span>Dashboard</button>
+    <button class="proto-bar__btn" data-go="5"><span class="proto-bar__num">5</span>Especialidades</button>
+    <button class="proto-bar__btn" data-go="6"><span class="proto-bar__num">6</span>Médicos</button>
+    <button class="proto-bar__btn" data-go="7"><span class="proto-bar__num">7</span>Calendario</button>
+    <button class="proto-bar__btn" data-go="8"><span class="proto-bar__num">8</span>Resumen</button>
+    <button class="proto-bar__btn" data-go="9"><span class="proto-bar__num">9</span>Confirmación</button>
+    <button class="proto-bar__btn" data-go="10"><span class="proto-bar__num">10</span>Mis citas</button>
+  </div>
+</nav>
+
+<!-- ====================================================== -->
+<!-- PANTALLA 1 — LANDING                                    -->
+<!-- ====================================================== -->
+<section class="screen-wrap active" id="screen-1">
+  <div class="hero">
+    <nav class="landing-nav">
+      <div class="app-logo">
+        <div class="app-logo__mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-5 8-12V5l-8-3-8 3v5c0 7 8 12 8 12z"/><path d="M12 8v8M8 12h8"/></svg>
+        </div>
+        Medi<em>Citas</em>
+      </div>
+      <div class="landing-nav__links">
+        <a href="#" data-go="5">Especialidades</a>
+        <a href="#" data-go="5">Médicos</a>
+        <a href="#">Cómo funciona</a>
+        <a href="#">Contacto</a>
+      </div>
+      <div class="landing-nav__cta">
+        <button class="btn btn--ghost" data-go="3">Iniciar sesión</button>
+        <button class="btn btn--primary" data-go="2">Crear cuenta</button>
+      </div>
+    </nav>
+
+    <div class="hero-main">
+      <div>
+        <div class="hero-eyebrow">
+          <span></span> Disponibilidad 24/7 · Sin filas, sin llamadas
+        </div>
+        <h1 class="hero-title">
+          Tu próxima cita médica,<br/>
+          en <em>tres clics</em>.
+        </h1>
+        <p class="hero-sub">
+          Agenda con los mejores especialistas, consulta horarios reales y gestiona tus citas desde donde estés. Una plataforma diseñada para que cuidar tu salud sea simple.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn--coral btn--lg" data-go="2">
+            Agendar mi primera cita
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+          <button class="btn btn--secondary btn--lg" data-go="3">Ya tengo cuenta</button>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-num">+120</div>
+            <div class="hero-stat-label">Médicos verificados</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">18</div>
+            <div class="hero-stat-label">Especialidades</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">4.9★</div>
+            <div class="hero-stat-label">Calificación promedio</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card hero-card--confirm">
+          <div class="check-circle">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h4>Cita confirmada</h4>
+          <p>Te enviamos los detalles a tu correo.</p>
+        </div>
+        <div class="hero-card hero-card--main">
+          <div class="hero-card__doctor">
+            <div class="hero-card__avatar">LR</div>
+            <div>
+              <div class="hero-card__name">Dra. Laura Restrepo</div>
+              <div class="hero-card__spec">Cardiología · 12 años exp.</div>
+            </div>
+          </div>
+          <div class="hero-card__detail">
+            <span class="hero-card__detail-label">Fecha</span>
+            <span class="hero-card__detail-val">Mié, 22 Mayo</span>
+          </div>
+          <div class="hero-card__detail">
+            <span class="hero-card__detail-label">Hora</span>
+            <span class="hero-card__detail-val">10:30 AM</span>
+          </div>
+          <div class="hero-card__detail">
+            <span class="hero-card__detail-label">Modalidad</span>
+            <span class="hero-card__detail-val">Presencial</span>
+          </div>
+        </div>
+        <div class="hero-card hero-card--specialty">
+          <div class="spec-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          <h4>Cardiología</h4>
+          <p>14 especialistas disponibles esta semana</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="specialties-strip">
+      <h2>Una red de especialidades para cada necesidad</h2>
+      <p>Encuentra al profesional adecuado en segundos</p>
+      <div class="spec-carousel">
+        <div class="spec-chip"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span>Cardiología</span></div>
+        <div class="spec-chip"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="10"/></svg><span>Oftalmología</span></div>
+        <div class="spec-chip"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2h5L21 7v6.5L12 22l-9-8.5V7z"/></svg><span>Dermatología</span></div>
+        <div class="spec-chip"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8 2 5 5 5 9c0 2 1 4 2 5l5 8 5-8c1-1 2-3 2-5 0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2"/></svg><span>Neurología</span></div>
+        <div class="spec-chip"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Pediatría</span></div>
+        <div class="spec-chip"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg><span>Medicina interna</span></div>
+        <div class="spec-chip"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>Ginecología</span></div>
+        <div class="spec-chip"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6v6H9z"/></svg><span>Ortopedia</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== -->
+<!-- PANTALLA 2 — REGISTRO (FUNCIONAL)                       -->
+<!-- ====================================================== -->
+<section class="screen-wrap" id="screen-2">
+  <div class="auth-layout">
+    <div class="auth-side">
+      <div class="auth-side__brand">
+        <div class="app-logo__mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-5 8-12V5l-8-3-8 3v5c0 7 8 12 8 12z"/><path d="M12 8v8M8 12h8"/></svg>
+        </div>
+        MediCitas
+      </div>
+      <div class="auth-side__quote">
+        "La salud no debería esperar.<br/><em>Tampoco las citas.</em>"
+      </div>
+      <div class="auth-side__footer">
+        <div class="auth-side__footer-label">Sprint 2 · Producto final</div>
+        <div class="auth-side__footer-text">Plataforma de reservas de citas médicas en línea — Disponibilidad real · Persistencia en archivos · Historial centralizado</div>
+      </div>
+    </div>
+    <div class="auth-form">
+      <div class="auth-form__head">
+        <h1 class="auth-form__title">Crea tu cuenta</h1>
+        <p class="auth-form__sub">¿Ya tienes una cuenta? <a href="#" data-go="3">Inicia sesión</a></p>
+      </div>
+      <div class="auth-grid">
+        <div class="input-group">
+          <label>Nombre</label>
+          <input class="input" id="reg-nombre" placeholder="María" />
+        </div>
+        <div class="input-group">
+          <label>Apellido</label>
+          <input class="input" id="reg-apellido" placeholder="Gómez" />
+        </div>
+      </div>
+      <div class="auth-grid">
+        <div class="input-group">
+          <label>Identificación</label>
+          <input class="input" id="reg-identificacion" placeholder="1 0XX XXX XXX" />
+        </div>
+        <div class="input-group">
+          <label>Teléfono</label>
+          <input class="input" id="reg-telefono" placeholder="+57 300 000 0000" />
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Correo electrónico</label>
+        <input class="input" id="reg-email" type="email" placeholder="maria@ejemplo.com" />
+      </div>
+      <div class="input-group">
+        <label>Contraseña</label>
+        <input class="input" id="reg-password" type="password" placeholder="Mínimo 8 caracteres" />
+        <div class="password-strength" id="reg-strength">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="input-hint" id="reg-pass-hint">Usa al menos 8 caracteres, con mayúsculas y números.</span>
+      </div>
+      <div class="auth-options">
+        <label><input type="checkbox" id="reg-terms" /> Acepto los términos y la política de privacidad</label>
+      </div>
+      <div class="form-msg" id="reg-msg"></div>
+      <button class="btn btn--primary btn--lg" style="width: 100%;" id="reg-submit">
+        Crear cuenta
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== -->
+<!-- PANTALLA 3 — LOGIN (FUNCIONAL)                          -->
+<!-- ====================================================== -->
+<section class="screen-wrap" id="screen-3">
+  <div class="auth-layout">
+    <div class="auth-side">
+      <div class="auth-side__brand">
+        <div class="app-logo__mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-5 8-12V5l-8-3-8 3v5c0 7 8 12 8 12z"/><path d="M12 8v8M8 12h8"/></svg>
+        </div>
+        MediCitas
+      </div>
+      <div class="auth-side__quote">
+        "Bienvenido de nuevo.<br/><em>Tu agenda te está esperando.</em>"
+      </div>
+      <div class="auth-side__footer">
+        <div class="auth-side__footer-label">Cuenta de prueba</div>
+        <div class="auth-side__footer-text">maria.gomez@correo.com · contraseña: Medicitas2026</div>
+      </div>
+    </div>
+    <div class="auth-form">
+      <div class="auth-form__head">
+        <h1 class="auth-form__title">Bienvenido</h1>
+        <p class="auth-form__sub">¿No tienes cuenta aún? <a href="#" data-go="2">Regístrate</a></p>
+      </div>
+      <div class="input-group">
+        <label>Correo electrónico</label>
+        <input class="input" id="login-email" type="email" placeholder="tu@correo.com" />
+      </div>
+      <div class="input-group">
+        <label>Contraseña</label>
+        <input class="input" id="login-password" type="password" placeholder="Tu contraseña" />
+      </div>
+      <div class="auth-options">
+        <label><input type="checkbox" id="login-remember" /> Mantener sesión iniciada</label>
+        <a href="#">¿Olvidaste tu contraseña?</a>
+      </div>
+      <div class="form-msg" id="login-msg"></div>
+      <button class="btn btn--primary btn--lg" style="width: 100%; margin-bottom: 16px;" id="login-submit">
+        Iniciar sesión
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <div style="text-align: center; padding: 14px 0; color: var(--ink-400); font-size: 13px; position: relative;">
+        <span style="background: white; padding: 0 14px; position: relative; z-index: 1;">o continúa con</span>
+        <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--ink-200);"></div>
+      </div>
+      <button class="btn btn--secondary btn--lg" style="width: 100%;" id="login-google">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.5 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h5.9c-.3 1.4-1 2.6-2.2 3.4v2.8h3.6c2.1-2 3.3-4.8 3.3-8.2z"/><path fill="#34A853" d="M12 23c2.9 0 5.4-1 7.2-2.6l-3.6-2.8c-1 .7-2.3 1.1-3.6 1.1-2.8 0-5.1-1.9-6-4.4H2.3v2.8C4.2 20.6 7.8 23 12 23z"/><path fill="#FBBC05" d="M6 14.3c-.2-.7-.4-1.4-.4-2.3s.1-1.6.4-2.3V7H2.3C1.5 8.5 1 10.2 1 12s.5 3.5 1.3 5z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3 .6 4.1 1.6L19.3 4C17.4 2.2 14.9 1 12 1 7.8 1 4.2 3.4 2.3 7L6 9.7c.9-2.5 3.2-4.3 6-4.3z"/></svg>
+        Continuar con Google
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== -->
+<!-- PANTALLA 4 — DASHBOARD (DINÁMICO)                       -->
+<!-- ====================================================== -->
+<section class="screen-wrap" id="screen-4">
+  <header class="app-header" data-app-header></header>
+  <div class="dash-wrap" id="dash-content">
+    <div class="loading-block"><span class="spinner"></span><div style="margin-top:12px">Cargando tu panel…</div></div>
+  </div>
+</section>
+
+<!-- ====================================================== -->
+<!-- PANTALLA 5 — ESPECIALIDADES (DINÁMICO)                  -->
+<!-- ====================================================== -->
+<section class="screen-wrap" id="screen-5">
+  <header class="app-header" data-app-header></header>
+  <div class="specs-wrap">
+    <div class="specs-header">
+      <div class="specs-breadcrumb">
+        <a href="#" data-go="4">Inicio</a> <span>›</span> <span>Agendar cita</span> <span>›</span> <strong style="color: var(--ink-900);">Especialidades</strong>
+      </div>
+      <h1 class="specs-title">¿Qué especialidad necesitas hoy?</h1>
+      <p class="specs-sub">Selecciona la especialidad médica que mejor se ajuste a tu consulta. Si tienes dudas, consulta con medicina general primero.</p>
+      <div class="specs-search">
+        <div class="search-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input placeholder="Buscar especialidad…" id="spec-search" />
+        </div>
+        <button class="btn btn--secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          Filtros
+        </button>
+      </div>
+    </div>
+    <div class="specs-grid" id="specs-grid">
+      <div class="loading-block" style="grid-column:1/-1"><span class="spinner"></span><div style="margin-top:12px">Cargando especialidades…</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== -->
+<!-- PANTALLA 6 — SELECCIÓN DE MÉDICO (DINÁMICO)             -->
+<!-- ====================================================== -->
+<section class="screen-wrap" id="screen-6">
+  <header class="app-header" data-app-header></header>
+  <div class="docs-wrap">
+    <div style="font-size: 13px; color: var(--ink-500); margin-bottom: 16px;">
+      <a href="#" data-go="4" style="color: var(--teal-700); font-weight: 600;">Inicio</a> ›
+      <a href="#" data-go="5" style="color: var(--teal-700); font-weight: 600;">Especialidades</a> ›
+      <strong style="color: var(--ink-900);" id="docs-bc-spec">Especialidad</strong>
+    </div>
+    <div class="docs-head">
+      <div>
+        <h1>Especialistas en <em id="docs-title-spec">—</em></h1>
+        <p id="docs-subtitle">Médicos disponibles · Filtrados por mejor calificación y cupos disponibles esta semana</p>
+      </div>
+    </div>
+    <div class="docs-filters">
+      <button class="filter-pill active">Todos</button>
+      <button class="filter-pill">Disponibles hoy</button>
+      <button class="filter-pill">Mejor calificación</button>
+      <button class="filter-pill">Sede El Poblado</button>
+      <button class="filter-pill">Sede Laureles</button>
+    </div>
+    <div class="docs-grid" style="margin-top: 24px;" id="docs-grid">
+      <div class="loading-block" style="grid-column:1/-1"><span class="spinner"></span><div style="margin-top:12px">Cargando médicos…</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== -->
+<!-- PANTALLA 7 — CALENDARIO Y HORARIOS (DINÁMICO)           -->
+<!-- ====================================================== -->
+<section class="screen-wrap" id="screen-7">
+  <header class="app-header" data-app-header></header>
+  <div class="cal-wrap">
+    <div style="font-size: 13px; color: var(--ink-500); margin-bottom: 16px;">
+      <a href="#" data-go="4" style="color: var(--teal-700); font-weight: 600;">Inicio</a> ›
+      <a href="#" data-go="5" style="color: var(--teal-700); font-weight: 600;">Especialidades</a> ›
+      <a href="#" data-go="6" style="color: var(--teal-700); font-weight: 600;" id="cal-bc-spec">Especialidad</a> ›
+      <strong style="color: var(--ink-900);">Agendar</strong>
+    </div>
+    <div class="cal-head">
+      <div>
+        <h1>Elige <em style="font-style: italic; color: var(--coral-600);">día y hora</em></h1>
+        <p>Selecciona un horario disponible. Los bloques grises ya están reservados.</p>
+      </div>
+      <div class="cal-doctor">
+        <div class="cal-doctor__avatar" id="cal-doc-avatar">—</div>
+        <div>
+          <div class="cal-doctor__name" id="cal-doc-name">—</div>
+          <div class="cal-doctor__spec" id="cal-doc-spec">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cal-layout">
+      <div class="cal-main">
+        <div class="cal-nav">
+          <div class="cal-month" id="cal-month">Mayo 2026</div>
+          <div class="cal-nav-arrows">
+            <button class="cal-arrow" id="cal-prev"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13L5 8l5-5"/></svg></button>
+            <button class="cal-arrow" id="cal-next"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l5-5-5-5"/></svg></button>
+          </div>
+        </div>
+
+        <div class="cal-section-title">Selecciona un día</div>
+        <div class="cal-week" id="cal-week"></div>
+
+        <div class="cal-section-title">Mañana</div>
+        <div class="time-grid" id="time-grid-am"></div>
+
+        <div class="cal-section-title">Tarde</div>
+        <div class="time-grid" id="time-grid-pm"></div>
+
+        <div class="legend">
+          <div class="legend-item"><span class="legend-dot free"></span>Disponible</div>
+          <div class="legend-item"><span class="legend-dot selected"></span>Seleccionado</div>
+          <div class="legend-item"><span class="legend-dot busy"></span>Ocupado</div>
+        </div>
+      </div>
+
+      <div class="cal-side">
+        <h3>Tu selección</h3>
+        <p>Confirma los detalles antes de continuar</p>
+        <div class="cal-side__summary" id="cal-summary"></div>
+        <button class="btn btn--coral btn--lg" style="width: 100%;" id="cal-continue">
+          Continuar
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <p style="font-size: 12px; color: var(--ink-400); margin-top: 14px; text-align: center;">
+          Podrás cancelar o reprogramar gratis hasta 24h antes.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== -->
+<!-- PANTALLA 8 — RESUMEN PREVIO (DINÁMICO)                  -->
+<!-- ====================================================== -->
+<section class="screen-wrap" id="screen-8">
+  <header class="app-header" data-app-header></header>
+  <div class="review-wrap">
+    <div class="review-head">
+      <h1>Revisa tu cita</h1>
+      <p>Verifica que los datos sean correctos antes de confirmar</p>
+    </div>
+
+    <div class="review-steps">
+      <div class="review-step done"><div class="review-step__num">✓</div>Especialidad</div>
+      <div class="review-step__line done"></div>
+      <div class="review-step done"><div class="review-step__num">✓</div>Médico</div>
+      <div class="review-step__line done"></div>
+      <div class="review-step done"><div class="review-step__num">✓</div>Horario</div>
+      <div class="review-step__line done"></div>
+      <div class="review-step current"><div class="review-step__num">4</div>Revisar</div>
+      <div class="review-step__line"></div>
+      <div class="review-step"><div class="review-step__num">5</div>Confirmar</div>
+    </div>
+
+    <div class="review-card">
+      <div class="review-card__head">
+        <div class="review-card__avatar" id="rev-avatar">—</div>
+        <div class="review-card__doctor">
+          <h2 id="rev-doctor">—</h2>
+          <p id="rev-doctor-sub">—</p>
+        </div>
+      </div>
+      <div class="review-card__body">
+        <div class="review-rows">
+          <div class="review-row">
+            <div class="review-row__label">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="12" height="12" rx="2"/><line x1="10" y1="1" x2="10" y2="5"/><line x1="6" y1="1" x2="6" y2="5"/></svg>
+              Fecha
+            </div>
+            <div class="review-row__value" id="rev-fecha">—</div>
+            <a class="review-row__edit" data-go="7">Cambiar</a>
+          </div>
+          <div class="review-row">
+            <div class="review-row__label">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="7"/><path d="M8 4v4l3 2"/></svg>
+              Hora
+            </div>
+            <div class="review-row__value" id="rev-hora">—</div>
+            <a class="review-row__edit" data-go="7">Cambiar</a>
+          </div>
+          <div class="review-row">
+            <div class="review-row__label">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 6s-6-5-6-5-6 5-6 5v6a2 2 0 002 2h8a2 2 0 002-2V6z"/></svg>
+              Modalidad
+            </div>
+            <div class="review-row__value" id="rev-modalidad">Presencial</div>
+            <span></span>
+          </div>
+          <div class="review-row">
+            <div class="review-row__label">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 6c0 4-6 8-6 8s-6-4-6-8a6 6 0 1112 0z"/><circle cx="8" cy="6" r="2"/></svg>
+              Sede
+            </div>
+            <div class="review-row__value" id="rev-sede">—</div>
+            <span></span>
+          </div>
+          <div class="review-row">
+            <div class="review-row__label">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="6" r="3"/><path d="M2 14a6 6 0 0112 0"/></svg>
+              Paciente
+            </div>
+            <div class="review-row__value" id="rev-paciente">—</div>
+            <span></span>
+          </div>
+          <div class="review-row">
+            <div class="review-row__label">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 5L6 13l-4-4"/></svg>
+              Valor
+            </div>
+            <div class="review-row__value" id="rev-valor">—</div>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="review-note">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="10"/><line x1="11" y1="7" x2="11" y2="11"/><line x1="11" y1="15" x2="11.01" y2="15"/></svg>
+      <div>
+        <div class="review-note__title">Política de cancelación</div>
+        <div class="review-note__text">Podrás cancelar o reprogramar tu cita sin costo hasta <strong>24 horas antes</strong> del horario agendado. Después de ese plazo se aplicará una tarifa de gestión.</div>
+      </div>
+    </div>
+
+    <div class="review-actions">
+      <button class="btn btn--secondary btn--lg" data-go="7">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Volver
+      </button>
+      <button class="btn btn--primary btn--lg" id="confirm-btn">
+        Confirmar cita
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== -->
+<!-- PANTALLA 9 — CONFIRMACIÓN (DINÁMICO)                    -->
+<!-- ====================================================== -->
+<section class="screen-wrap" id="screen-9">
+  <header class="app-header" data-app-header></header>
+  <div class="confirm-wrap">
+    <div class="confirm-inner">
+      <div class="confirm-hero">
+        <div class="confirm-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h1>¡Tu cita está <em>confirmada</em>!</h1>
+        <p>Hemos enviado todos los detalles a tu correo electrónico.</p>
+      </div>
+
+      <div class="confirm-ticket">
+        <div class="confirm-ticket__head">
+          <div>
+            <div class="confirm-ticket__code">Código de reserva</div>
+            <div class="confirm-ticket__code-val" id="conf-codigo">—</div>
+          </div>
+          <div class="confirm-ticket__qr"><div class="qr-grid"></div></div>
+        </div>
+        <div class="confirm-ticket__body">
+          <div class="confirm-ticket__doctor">
+            <div class="confirm-ticket__avatar" id="conf-avatar">—</div>
+            <div>
+              <h3 id="conf-doctor">—</h3>
+              <p id="conf-doctor-sub">—</p>
+            </div>
+          </div>
+          <div class="confirm-ticket__detail-grid">
+            <div>
+              <div class="confirm-detail__label">Fecha</div>
+              <div class="confirm-detail__value">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="12" height="12" rx="2"/><line x1="10" y1="1" x2="10" y2="5"/><line x1="6" y1="1" x2="6" y2="5"/></svg>
+                <span id="conf-fecha">—</span>
+              </div>
+            </div>
+            <div>
+              <div class="confirm-detail__label">Hora</div>
+              <div class="confirm-detail__value">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="7"/><path d="M8 4v4l3 2"/></svg>
+                <span id="conf-hora">—</span>
+              </div>
+            </div>
+            <div>
+              <div class="confirm-detail__label">Sede</div>
+              <div class="confirm-detail__value">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 6c0 4-6 8-6 8s-6-4-6-8a6 6 0 1112 0z"/><circle cx="8" cy="6" r="2"/></svg>
+                <span id="conf-sede">—</span>
+              </div>
+            </div>
+            <div>
+              <div class="confirm-detail__label">Modalidad</div>
+              <div class="confirm-detail__value">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 6s-6-5-6-5-6 5-6 5v6a2 2 0 002 2h8a2 2 0 002-2V6z"/></svg>
+                <span id="conf-modalidad">Presencial</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirm-mail">
+        <div class="confirm-mail__icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 6 12 13 2 6"/></svg>
+        </div>
+        <div>
+          <div class="confirm-mail__title" id="conf-mail">Correo enviado</div>
+          <div class="confirm-mail__text">Recibirás un recordatorio automático 24 horas antes de tu cita.</div>
+        </div>
+      </div>
+
+      <div class="confirm-cta">
+        <button class="btn btn--secondary btn--lg" data-go="10">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2z"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+          Ver mis citas
+        </button>
+        <button class="btn btn--primary btn--lg" data-go="4">
+          Ir a mi panel
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== -->
+<!-- PANTALLA 10 — MIS CITAS (NUEVA, DINÁMICA)               -->
+<!-- ====================================================== -->
+<section class="screen-wrap" id="screen-10">
+  <header class="app-header" data-app-header></header>
+  <div class="appts-wrap">
+    <div class="appts-head">
+      <h1>Mis <em>citas</em></h1>
+      <p>Gestiona, revisa o cancela tus citas médicas agendadas.</p>
+    </div>
+    <div class="appt-tabs">
+      <button class="filter-pill active" data-filtro="todas">Todas</button>
+      <button class="filter-pill" data-filtro="confirmada">Confirmadas</button>
+      <button class="filter-pill" data-filtro="cancelada">Canceladas</button>
+    </div>
+    <div id="appts-list">
+      <div class="loading-block"><span class="spinner"></span><div style="margin-top:12px">Cargando tus citas…</div></div>
+    </div>
+  </div>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>

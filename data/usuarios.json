@@ -1,0 +1,12 @@
+[
+  {
+    "id": "u-maria",
+    "nombre": "María",
+    "apellido": "Gómez",
+    "identificacion": "1027456789",
+    "telefono": "+57 300 123 4567",
+    "email": "maria.gomez@correo.com",
+    "password": "Medicitas2026",
+    "creadoEn": "2026-05-01T09:00:00.000Z"
+  }
+]

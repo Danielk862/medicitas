@@ -1,0 +1,10 @@
+[
+  { "id": "cardiologia",     "nombre": "Cardiología",      "icono": 1, "descripcion": "Diagnóstico y tratamiento del corazón y sistema circulatorio.", "medicos": 14 },
+  { "id": "oftalmologia",    "nombre": "Oftalmología",     "icono": 2, "descripcion": "Evaluación de la salud visual y enfermedades de los ojos.",       "medicos": 9  },
+  { "id": "dermatologia",    "nombre": "Dermatología",     "icono": 3, "descripcion": "Atención de la piel, cabello, uñas y mucosas.",                 "medicos": 11 },
+  { "id": "neurologia",      "nombre": "Neurología",       "icono": 4, "descripcion": "Trastornos del sistema nervioso central y periférico.",         "medicos": 7  },
+  { "id": "pediatria",       "nombre": "Pediatría",        "icono": 2, "descripcion": "Atención integral para bebés, niños y adolescentes.",           "medicos": 16 },
+  { "id": "medicina-interna","nombre": "Medicina interna", "icono": 1, "descripcion": "Prevención, diagnóstico y tratamiento del adulto.",             "medicos": 22 },
+  { "id": "ginecologia",     "nombre": "Ginecología",      "icono": 3, "descripcion": "Salud integral del aparato reproductor femenino.",            "medicos": 13 },
+  { "id": "ortopedia",       "nombre": "Ortopedia",        "icono": 4, "descripcion": "Diagnóstico y tratamiento del sistema musculoesquelético.",    "medicos": 8  }
+]
