@@ -139,7 +139,7 @@ app.get('/api/disponibilidad', (req, res) => {
 /* ================================================================== */
 
 app.post('/api/registro', (req, res) => {
-  const { nombre, apellido, identificacion, telefono, email, password, tipo, medicoId } = req.body;
+  const { nombre, apellido, identificacion, telefono, email, password, tipo, medicoId, especialidad } = req.body;
 
   if (!nombre || !apellido || !email || !password) {
     return res.status(400).json({ error: 'Faltan campos obligatorios.' });
@@ -166,7 +166,8 @@ app.post('/api/registro', (req, res) => {
     email,
     password,
     tipo: perfil,
-    medicoId: perfil === 'medico' ? medicoId : null,
+    medicoId: perfil === 'medico' ? (medicoId || null) : null,
+    especialidad: perfil === 'medico' ? (especialidad || null) : null,
     creadoEn: new Date().toISOString()
   };
   usuarios.push(nuevo);

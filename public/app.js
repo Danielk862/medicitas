@@ -255,10 +255,31 @@ document.addEventListener('keydown', (e) => {
 /* ================================================================== */
 /*  TIPO DE PERFIL (paciente / médico) en registro y login            */
 /* ================================================================== */
+async function cargarEspecialidadesRegistro() {
+  const sel = document.getElementById('reg-especialidad');
+  if (sel.children.length > 1) return;
+  try {
+    const lista = _especialidadesCache.length ? _especialidadesCache : await api('/api/especialidades');
+    sel.innerHTML = '<option value="">Selecciona tu especialidad…</option>' +
+      lista.map(e => `<option value="${e.id}">${e.nombre}</option>`).join('');
+  } catch (e) {}
+}
+
 document.querySelectorAll('[data-reg-tipo]').forEach(btn => {
   btn.addEventListener('click', function () {
     App.regTipo = this.dataset.regTipo;
     document.querySelectorAll('[data-reg-tipo]').forEach(b => b.classList.toggle('active', b === this));
+    const grupo = document.getElementById('reg-especialidad-group');
+    if (App.regTipo === 'medico') { grupo.style.display = ''; cargarEspecialidadesRegistro(); }
+    else grupo.style.display = 'none';
+    /* Limpiar campos al cambiar perfil */
+    ['reg-nombre','reg-apellido','reg-identificacion','reg-telefono','reg-email','reg-password'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('reg-especialidad').value = '';
+    document.getElementById('reg-terms').checked = false;
+    document.getElementById('reg-strength').className = 'password-strength';
+    ocultarMensaje('reg-msg');
   });
 });
 
@@ -266,6 +287,9 @@ document.querySelectorAll('[data-login-tipo]').forEach(btn => {
   btn.addEventListener('click', function () {
     App.loginTipo = this.dataset.loginTipo;
     document.querySelectorAll('[data-login-tipo]').forEach(b => b.classList.toggle('active', b === this));
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-password').value = '';
+    ocultarMensaje('login-msg');
   });
 });
 
@@ -289,11 +313,15 @@ document.getElementById('reg-submit').addEventListener('click', async function (
     email: document.getElementById('reg-email').value.trim(),
     password: document.getElementById('reg-password').value,
     tipo: App.regTipo,
+    especialidad: App.regTipo === 'medico' ? document.getElementById('reg-especialidad').value : null,
     medicoId: null
   };
 
   if (!body.nombre || !body.apellido || !body.email || !body.password) {
     return mostrarMensaje('reg-msg', 'Completa todos los campos obligatorios.', 'err');
+  }
+  if (App.regTipo === 'medico' && !body.especialidad) {
+    return mostrarMensaje('reg-msg', 'Selecciona tu especialidad médica.', 'err');
   }
   if (!document.getElementById('reg-terms').checked) {
     return mostrarMensaje('reg-msg', 'Debes aceptar los términos y la política de privacidad.', 'err');
@@ -355,32 +383,34 @@ async function cargarDashboard() {
   try {
     const citas = await api(`/api/citas?usuarioId=${encodeURIComponent(u.id)}`);
     const activas = citas.filter(c => c.estado === 'confirmada');
-    const proxima = activas[0];
+    const proximas = activas.slice(0, 3);
 
     const hora = new Date().getHours();
     const saludo = hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
 
-    let proximaHTML;
-    if (proxima) {
-      const [, m, d] = proxima.fecha.split('-').map(Number);
-      proximaHTML = `
-        <div class="next-appt">
-          <div class="next-appt__date">
-            <div class="next-appt__day">${d}</div>
-            <div class="next-appt__month">${MESES_CORTO[m - 1]}</div>
-          </div>
-          <div class="next-appt__info">
-            <div class="next-appt__doctor">${proxima.medicoNombre}</div>
-            <div class="next-appt__spec">${proxima.especialidad} · Consulta general</div>
-            <div class="next-appt__meta">
-              <div><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="6"/><path d="M7 3v4l3 2"/></svg> ${proxima.hora}</div>
-              <div><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-7-8-13a8 8 0 1116 0c0 6-8 13-8 13z"/><circle cx="12" cy="9" r="3"/></svg> Sede ${proxima.sede}</div>
-              <div><span class="badge badge--green">Confirmada</span></div>
+    let proximasHTML;
+    if (proximas.length) {
+      proximasHTML = proximas.map((c, i) => {
+        const [, m, d] = c.fecha.split('-').map(Number);
+        return `
+          <div class="next-appt"${i > 0 ? ' style="border-top:1px solid var(--ink-100);margin-top:14px;padding-top:14px"' : ''}>
+            <div class="next-appt__date">
+              <div class="next-appt__day">${d}</div>
+              <div class="next-appt__month">${MESES_CORTO[m - 1]}</div>
             </div>
-          </div>
-        </div>`;
+            <div class="next-appt__info">
+              <div class="next-appt__doctor">${c.medicoNombre}</div>
+              <div class="next-appt__spec">${c.especialidad} · Consulta general</div>
+              <div class="next-appt__meta">
+                <div><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="6"/><path d="M7 3v4l3 2"/></svg> ${c.hora}</div>
+                <div><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-7-8-13a8 8 0 1116 0c0 6-8 13-8 13z"/><circle cx="12" cy="9" r="3"/></svg> Sede ${c.sede}</div>
+                <div><span class="badge badge--green">Confirmada</span></div>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
     } else {
-      proximaHTML = `<div class="empty-state" style="padding:30px 10px">
+      proximasHTML = `<div class="empty-state" style="padding:30px 10px">
         <div class="empty-state__icon"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="24" height="22" rx="3"/><line x1="22" y1="3" x2="22" y2="9"/><line x1="10" y1="3" x2="10" y2="9"/></svg></div>
         <h3>No tienes citas próximas</h3>
         <p>Agenda tu primera cita para empezar a cuidar tu salud.</p>
@@ -393,7 +423,7 @@ async function cargarDashboard() {
         <div>
           <div class="dash-hero__greeting">${saludo}</div>
           <h1 class="dash-hero__title">Hola, <em>${u.nombre}</em>. ¿Cómo te sientes hoy?</h1>
-          <p class="dash-hero__sub">${proxima ? 'Tienes una cita próxima. Aprovecha para preparar tus preguntas para el especialista.' : 'Agenda una cita con nuestros especialistas en pocos pasos.'}</p>
+          <p class="dash-hero__sub">${proximas.length ? 'Tienes citas próximas. Aprovecha para preparar tus preguntas para el especialista.' : 'Agenda una cita con nuestros especialistas en pocos pasos.'}</p>
         </div>
         <div class="dash-hero__action">
           <button class="btn btn--coral btn--lg" data-go="5">
@@ -406,10 +436,10 @@ async function cargarDashboard() {
         <div>
           <div class="panel">
             <div class="panel__head">
-              <h2 class="panel__title">Próxima cita</h2>
+              <h2 class="panel__title">Próximas citas</h2>
               <a class="panel__link" data-go="10">Ver todas →</a>
             </div>
-            ${proximaHTML}
+            ${proximasHTML}
             <div class="quick-actions">
               <button class="quick-action" data-go="5">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg>
@@ -960,18 +990,39 @@ async function cargarPanelMedico() {
 
   /* Punto 4: el médico solo gestiona su propia disponibilidad */
   if (esMedico()) {
-    const yo = _medListaMedicos.find(m => m.id === App.usuario.medicoId) || _medListaMedicos[0];
-    if (yo) sel.value = yo.id;
+    const u = App.usuario;
+    const yo = _medListaMedicos.find(m => m.id === u.medicoId);
+    /* Si no está vinculado a un perfil en medicos.json, elegir el primero de su especialidad */
+    const defecto = yo
+      || (u.especialidad ? _medListaMedicos.find(m => m.especialidadId === u.especialidad) : null)
+      || _medListaMedicos[0];
+    if (defecto) sel.value = defecto.id;
     grupo.style.display = 'none';
     tarjeta.style.display = '';
-    tarjeta.innerHTML = yo ? `
-      <div class="med-self-card">
-        <div class="med-self-card__avatar">${yo.iniciales}</div>
-        <div>
-          <div class="med-self-card__name">${yo.nombre}</div>
-          <div class="med-self-card__spec">${yo.especialidad} · Sede ${yo.sede}</div>
-        </div>
-      </div>` : '';
+    if (yo) {
+      tarjeta.innerHTML = `
+        <div class="med-self-card">
+          <div class="med-self-card__avatar">${yo.iniciales}</div>
+          <div>
+            <div class="med-self-card__name">${yo.nombre}</div>
+            <div class="med-self-card__spec">${yo.especialidad} · Sede ${yo.sede}</div>
+          </div>
+        </div>`;
+    } else {
+      if (!_especialidadesCache.length) {
+        try { _especialidadesCache = await api('/api/especialidades'); } catch (_) {}
+      }
+      const espNombre = (_especialidadesCache.find(e => e.id === u.especialidad) || {}).nombre
+        || u.especialidad || 'Médico';
+      tarjeta.innerHTML = `
+        <div class="med-self-card">
+          <div class="med-self-card__avatar">${iniciales(u)}</div>
+          <div>
+            <div class="med-self-card__name">${u.nombre} ${u.apellido}</div>
+            <div class="med-self-card__spec">${espNombre}</div>
+          </div>
+        </div>`;
+    }
   } else {
     grupo.style.display = '';
     tarjeta.style.display = 'none';
