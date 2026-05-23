@@ -95,7 +95,7 @@ app.get('/api/disponibilidad', (req, res) => {
   const citas = leer('citas.json');
   const citasDia = citas.filter(c => c.medicoId === medicoId && c.fecha === fecha);
 
-  /* Horarios ocupados por citas activas (confirmadas) */
+  /* Horarios ocupados por citas activas (confirmadas o reprogramadas) */
   const ocupadosPorCitas = citasDia.filter(c => c.estado !== 'cancelada').map(c => c.hora);
 
   /* Horarios que tuvieron una cita CANCELADA: se liberan explícitamente,
@@ -107,16 +107,30 @@ app.get('/api/disponibilidad', (req, res) => {
     ...ocupadosPorCitas
   ]);
 
-  const construir = (lista) => lista.map(hora => ({
-    hora,
-    estado: ocupados.has(hora) ? 'ocupado' : 'disponible'
-  }));
+  /* HU-10: si el médico configuró su agenda, solo se ofrecen las franjas
+     que él habilitó para ese día de la semana. */
+  const agendas = leer('agendas.json');
+  const agendaMed = (!Array.isArray(agendas) && agendas[medicoId]) ? agendas[medicoId] : null;
+  let habilitadas = null;
+  if (agendaMed) {
+    const [y, m, d] = fecha.split('-').map(Number);
+    const diaSemana = DIAS_SEMANA[new Date(y, m - 1, d).getDay()];
+    habilitadas = new Set(agendaMed[diaSemana] || []);
+  }
+
+  const construir = (lista) => lista
+    .filter(hora => habilitadas === null || habilitadas.has(hora))
+    .map(hora => ({ hora, estado: ocupados.has(hora) ? 'ocupado' : 'disponible' }));
+
+  const manana = construir(HORARIOS_MANANA);
+  const tarde = construir(HORARIOS_TARDE);
 
   res.json({
     fecha,
     medicoId,
-    manana: construir(HORARIOS_MANANA),
-    tarde: construir(HORARIOS_TARDE)
+    agendaConfigurada: agendaMed !== null,
+    manana,
+    tarde
   });
 });
 
@@ -263,6 +277,88 @@ app.patch('/api/citas/:id/cancelar', (req, res) => {
   escribir('citas.json', citas);
 
   res.json({ cita });
+});
+
+/* HU-08 — Reprogramación de cita: cambia fecha/hora sin perder la reserva */
+app.patch('/api/citas/:id/reprogramar', (req, res) => {
+  const { fecha, hora } = req.body;
+  if (!fecha || !hora) {
+    return res.status(400).json({ error: 'Debes indicar la nueva fecha y hora.' });
+  }
+
+  const citas = leer('citas.json');
+  const cita = citas.find(c => c.id === req.params.id);
+  if (!cita) return res.status(404).json({ error: 'Cita no encontrada.' });
+  if (cita.estado === 'cancelada') {
+    return res.status(409).json({ error: 'No se puede reprogramar una cita cancelada.' });
+  }
+
+  /* El cupo destino del médico no puede estar ocupado por otra cita */
+  const ocupado = citas.some(c =>
+    c.id !== cita.id && c.medicoId === cita.medicoId && c.fecha === fecha &&
+    c.hora === hora && c.estado !== 'cancelada'
+  );
+  if (ocupado) {
+    return res.status(409).json({ error: 'Ese horario ya fue reservado. Elige otro.' });
+  }
+
+  /* El paciente no puede tener otra cita el mismo día y hora */
+  const choque = citas.find(c =>
+    c.id !== cita.id && c.usuarioId === cita.usuarioId && c.fecha === fecha &&
+    c.hora === hora && c.estado !== 'cancelada'
+  );
+  if (choque) {
+    return res.status(409).json({
+      code: 'conflicto-agenda',
+      error: `Ya tienes otra cita ese día a las ${hora} con ${choque.medicoNombre}. Elige otro horario.`
+    });
+  }
+
+  cita.fechaAnterior = cita.fecha;
+  cita.horaAnterior = cita.hora;
+  cita.fecha = fecha;
+  cita.hora = hora;
+  cita.estado = 'reprogramada';
+  cita.reprogramadoEn = new Date().toISOString();
+  escribir('citas.json', citas);
+
+  res.json({ cita });
+});
+
+/* ================================================================== */
+/*  HU-11 — Citas de un médico (panel del médico)                      */
+/* ================================================================== */
+app.get('/api/medicos/:id/citas', (req, res) => {
+  const { fecha } = req.query;
+  let citas = leer('citas.json').filter(c => c.medicoId === req.params.id && c.estado !== 'cancelada');
+  if (fecha) citas = citas.filter(c => c.fecha === fecha);
+  citas.sort((a, b) => (a.fecha + a.hora).localeCompare(b.fecha + b.hora));
+  res.json(citas);
+});
+
+/* ================================================================== */
+/*  HU-10 — Gestión de agenda médica                                   */
+/*  Cada médico configura qué franjas atiende por día de la semana.    */
+/*  Se persiste en agendas.json: { medicoId: { dia: [horas] } }        */
+/* ================================================================== */
+const DIAS_SEMANA = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+
+app.get('/api/agenda/:medicoId', (req, res) => {
+  const agendas = leer('agendas.json');
+  const agenda = (Array.isArray(agendas) ? {} : agendas)[req.params.medicoId];
+  res.json({ medicoId: req.params.medicoId, agenda: agenda || null });
+});
+
+app.put('/api/agenda/:medicoId', (req, res) => {
+  const { agenda } = req.body;
+  if (!agenda || typeof agenda !== 'object') {
+    return res.status(400).json({ error: 'Agenda inválida.' });
+  }
+  let agendas = leer('agendas.json');
+  if (Array.isArray(agendas)) agendas = {};
+  agendas[req.params.medicoId] = agenda;
+  escribir('agendas.json', agendas);
+  res.json({ medicoId: req.params.medicoId, agenda });
 });
 
 /* ================================================================== */

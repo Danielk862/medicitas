@@ -9,15 +9,26 @@ aplicación **completamente funcional**, con persistencia real de datos en
 
 ## ✅ ¿Qué hace?
 
-- **Registro e inicio de sesión** de usuarios con validación.
-- **Catálogo de especialidades** y **médicos** por especialidad.
-- **Calendario con disponibilidad real**: los cupos ya reservados se muestran ocupados.
-- **Agendamiento de citas** con código de reserva único (`MED-2026-XXXXX`).
-- **Mis citas**: ver, filtrar y **cancelar** citas (el cupo se libera al cancelar).
-- **Toda la información se guarda en archivos planos** dentro de `/data`.
+Cubre las historias de usuario de los **Sprints 1 y 2**:
 
-Se conserva íntegramente el sistema de diseño del Sprint 1 (colores teal/coral,
-tipografías Fraunces + Manrope y todos los componentes).
+**Sprint 1 — Flujo del paciente**
+- **HU-01 Registro** e **HU-02 Inicio de sesión** con validación.
+- **HU-03 Especialidades** e **HU-04 Médicos** por especialidad.
+- **HU-05 Agendamiento** con calendario y disponibilidad real.
+- **HU-06 Confirmación** con código de reserva único (`MED-2026-XXXXX`).
+
+**Sprint 2 — Gestión completa de citas**
+- **HU-07 Cancelación**: cancela una cita y libera el cupo del médico.
+- **HU-05B Revisión previa**: pantalla de resumen editable antes de confirmar.
+- **HU-08 Reprogramación**: cambia fecha/hora de una cita sin perder la reserva.
+- **HU-09 Historial**: vista "Mis citas" con pestañas Próximas / Pasadas / Canceladas.
+- **HU-10 Gestión de agenda médica**: el médico configura las franjas que atiende por día; el calendario del paciente solo muestra esas horas.
+- **HU-11 Panel del médico**: agenda del día y configuración de disponibilidad.
+- **HU-18 Búsqueda**: buscador de especialidades por nombre (insensible a tildes).
+
+Toda la información se guarda en **archivos planos JSON** dentro de `/data`.
+Se conserva íntegramente el sistema de diseño del Sprint 1.
+
 
 ---
 
@@ -61,6 +72,7 @@ medicitas/
 ├── data/                  # ARCHIVOS PLANOS (la "base de datos")
 │   ├── usuarios.json
 │   ├── citas.json
+│   ├── agendas.json       # HU-10: franjas configuradas por médico
 │   ├── medicos.json
 │   └── especialidades.json
 └── public/                # Frontend
@@ -82,7 +94,11 @@ medicitas/
 | POST   | `/api/login`                        | Iniciar sesión                      |
 | GET    | `/api/citas?usuarioId=ID`           | Citas de un usuario                 |
 | POST   | `/api/citas`                        | Agendar una cita                    |
-| PATCH  | `/api/citas/:id/cancelar`           | Cancelar una cita                   |
+| PATCH  | `/api/citas/:id/cancelar`           | Cancelar una cita (HU-07)           |
+| PATCH  | `/api/citas/:id/reprogramar`        | Reprogramar una cita (HU-08)        |
+| GET    | `/api/medicos/:id/citas?fecha=`     | Citas de un médico (HU-11)          |
+| GET    | `/api/agenda/:medicoId`             | Leer agenda del médico (HU-10)      |
+| PUT    | `/api/agenda/:medicoId`             | Guardar agenda del médico (HU-10)   |
 
 Todos los cambios se escriben directamente en los archivos `.json` de `/data`,
 de modo que **los datos sobreviven al reinicio del servidor**.

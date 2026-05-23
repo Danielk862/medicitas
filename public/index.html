@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MediCitas · Prototipo Funcional Sprint 2</title>
+<title>MediCitas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -625,15 +625,88 @@
       <p>Gestiona, revisa o cancela tus citas médicas agendadas.</p>
     </div>
     <div class="appt-tabs">
-      <button class="filter-pill active" data-filtro="todas">Todas</button>
-      <button class="filter-pill" data-filtro="confirmada">Confirmadas</button>
+      <button class="filter-pill active" data-filtro="proximas">Próximas</button>
+      <button class="filter-pill" data-filtro="pasadas">Pasadas</button>
       <button class="filter-pill" data-filtro="cancelada">Canceladas</button>
+      <button class="filter-pill" data-filtro="todas">Todas</button>
     </div>
     <div id="appts-list">
       <div class="loading-block"><span class="spinner"></span><div style="margin-top:12px">Cargando tus citas…</div></div>
     </div>
   </div>
 </section>
+
+<!-- ====================================================== -->
+<!-- PANTALLA 11 — PANEL DEL MÉDICO (HU-10 + HU-11)          -->
+<!-- ====================================================== -->
+<section class="screen-wrap" id="screen-11">
+  <header class="app-header" data-app-header></header>
+  <div class="appts-wrap">
+    <div class="appts-head">
+      <h1>Panel del <em>médico</em></h1>
+      <p>Revisa tu agenda del día y configura tus horarios de atención.</p>
+    </div>
+
+    <div class="input-group" style="max-width:380px">
+      <label>Selecciona el médico</label>
+      <select class="input" id="med-select"></select>
+    </div>
+
+    <div class="dash-grid" style="margin-top:8px">
+      <div>
+        <div class="panel">
+          <div class="panel__head">
+            <h2 class="panel__title">Agenda del día</h2>
+            <input class="input" type="date" id="med-fecha" style="max-width:180px;padding:8px 12px" />
+          </div>
+          <div id="med-citas">
+            <div class="loading-block"><span class="spinner"></span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="panel">
+          <div class="panel__head"><h2 class="panel__title">Configurar disponibilidad</h2></div>
+          <p style="color:var(--ink-500);font-size:13px;margin-bottom:14px">Marca las franjas que atiendes cada día. El calendario del paciente solo mostrará estas horas.</p>
+          <div class="input-group">
+            <label>Día de la semana</label>
+            <select class="input" id="med-dia">
+              <option value="lunes">Lunes</option>
+              <option value="martes">Martes</option>
+              <option value="miercoles">Miércoles</option>
+              <option value="jueves">Jueves</option>
+              <option value="viernes">Viernes</option>
+            </select>
+          </div>
+          <div class="cal-section-title">Mañana</div>
+          <div class="time-grid" id="med-slots-am"></div>
+          <div class="cal-section-title">Tarde</div>
+          <div class="time-grid" id="med-slots-pm"></div>
+          <button class="btn btn--primary btn--lg" style="width:100%;margin-top:16px" id="med-guardar">Guardar disponibilidad</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================== -->
+<!-- MODAL DE REPROGRAMACIÓN (HU-08)                         -->
+<!-- ====================================================== -->
+<div class="modal-overlay" id="repro-modal">
+  <div class="modal" style="max-width:560px">
+    <h3>Reprogramar cita</h3>
+    <p id="repro-info">—</p>
+    <div class="cal-week" id="repro-week" style="margin-bottom:14px"></div>
+    <div class="cal-section-title">Mañana</div>
+    <div class="time-grid" id="repro-am"></div>
+    <div class="cal-section-title">Tarde</div>
+    <div class="time-grid" id="repro-pm"></div>
+    <div class="modal__actions" style="margin-top:20px">
+      <button class="btn btn--secondary btn--lg" style="flex:1" id="repro-cancel">Cancelar</button>
+      <button class="btn btn--primary btn--lg" style="flex:1" id="repro-ok">Confirmar cambio</button>
+    </div>
+  </div>
+</div>
 
 <script src="app.js"></script>
 </body>

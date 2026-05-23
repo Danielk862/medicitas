@@ -121,6 +121,7 @@
      (Quita la clase "hide-proto-bar" del <body> para volver a verla.) */
   body.hide-proto-bar .proto-bar { display: none; }
   body.hide-proto-bar .screen-wrap { margin-top: 0; min-height: 100vh; }
+  body.hide-proto-bar .app-header { top: 0; }
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
@@ -132,7 +133,7 @@
     border-bottom: 1px solid var(--ink-200);
     padding: 18px 48px;
     display: flex; align-items: center; justify-content: space-between;
-    position: static; top: 60px; z-index: 50;
+    position: static;
   }
   .app-logo {
     display: flex; align-items: center; gap: 12px;
@@ -846,11 +847,14 @@
     border-radius: 4px;
   }
 
-  #screen-7 .time-grid {
+  #screen-7 .time-grid,
+  #screen-11 .time-grid,
+  #repro-modal .time-grid {
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
     margin-bottom: 24px;
   }
-  #screen-7 .time-slot {
+  #repro-modal .time-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  #screen-7 .time-slot, #screen-11 .time-slot, #repro-modal .time-slot {
     padding: 14px;
     border-radius: 10px;
     text-align: center;
@@ -859,18 +863,18 @@
     transition: all 0.15s;
     border: 1.5px solid;
   }
-  #screen-7 .time-slot--free {
+  #screen-7 .time-slot--free, #screen-11 .time-slot--free, #repro-modal .time-slot--free {
     background: var(--white); border-color: var(--ink-200); color: var(--ink-900);
   }
-  #screen-7 .time-slot--free:hover {
+  #screen-7 .time-slot--free:hover, #screen-11 .time-slot--free:hover, #repro-modal .time-slot--free:hover {
     border-color: var(--teal-500); background: var(--teal-50);
     transform: translateY(-2px);
   }
-  #screen-7 .time-slot--selected {
+  #screen-7 .time-slot--selected, #screen-11 .time-slot--selected, #repro-modal .time-slot--selected {
     background: var(--teal-700); border-color: var(--teal-800); color: var(--white);
     box-shadow: 0 8px 20px rgba(17,122,130,0.3);
   }
-  #screen-7 .time-slot--busy {
+  #screen-7 .time-slot--busy, #screen-11 .time-slot--busy, #repro-modal .time-slot--busy {
     background: var(--ink-100); border-color: var(--ink-100);
     color: var(--ink-400); cursor: not-allowed;
     text-decoration: line-through;

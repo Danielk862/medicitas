@@ -17,5 +17,24 @@
     "precio": 120000,
     "estado": "confirmada",
     "creadoEn": "2026-05-10T14:20:00.000Z"
+  },
+  {
+    "id": "MED-2026-WEYKT",
+    "usuarioId": "u-maria",
+    "medicoId": "mp",
+    "medicoNombre": "Dra. Marcela Patiño",
+    "medicoIniciales": "MP",
+    "especialidad": "Oftalmología",
+    "universidad": "Universidad CES",
+    "experiencia": 14,
+    "fecha": "2026-05-26",
+    "hora": "8:30 AM",
+    "duracion": 30,
+    "modalidad": "Presencial",
+    "sede": "El Poblado",
+    "direccion": "Cra. 43A #16-50",
+    "precio": 115000,
+    "estado": "confirmada",
+    "creadoEn": "2026-05-23T15:32:33.935Z"
   }
 ]

@@ -146,7 +146,7 @@ function renderHeaders(activo) {
     { label: 'Inicio', go: 4 },
     { label: 'Especialidades', go: 5 },
     { label: 'Mis citas', go: 10 },
-    { label: 'Perfil', go: 4 }
+    { label: 'Panel médico', go: 11 }
   ];
   document.querySelectorAll('[data-app-header]').forEach(header => {
     header.innerHTML = `
@@ -170,7 +170,7 @@ function renderHeaders(activo) {
 /* ------------------------------------------------------------------ */
 /*  Navegación entre pantallas                                         */
 /* ------------------------------------------------------------------ */
-const SCREEN_TITLES = { 4: 'Inicio', 5: 'Especialidades', 6: 'Especialidades', 7: 'Especialidades', 8: 'Especialidades', 9: 'Inicio', 10: 'Mis citas' };
+const SCREEN_TITLES = { 4: 'Inicio', 5: 'Especialidades', 6: 'Especialidades', 7: 'Especialidades', 8: 'Especialidades', 9: 'Inicio', 10: 'Mis citas', 11: 'Panel médico' };
 
 function requiereSesion(num) {
   return num >= 4 && !App.usuario;
@@ -200,6 +200,7 @@ function showScreen(num) {
   if (num === 7) cargarCalendario();
   if (num === 8) renderResumen();
   if (num === 10) cargarMisCitas();
+  if (num === 11) cargarPanelMedico();
 }
 
 document.addEventListener('click', (e) => {
@@ -214,7 +215,7 @@ document.addEventListener('keydown', (e) => {
   const active = document.querySelector('.screen-wrap.active');
   if (!active) return;
   const current = parseInt(active.id.replace('screen-', ''));
-  if (e.key === 'ArrowRight' && current < 10) showScreen(current + 1);
+  if (e.key === 'ArrowRight' && current < 11) showScreen(current + 1);
   if (e.key === 'ArrowLeft' && current > 1) showScreen(current - 1);
 });
 
@@ -720,7 +721,7 @@ function renderConfirmacion(cita) {
 /*  MIS CITAS                                                          */
 /* ================================================================== */
 let _misCitas = [];
-let _filtroCitas = 'todas';
+let _filtroCitas = 'proximas';
 
 async function cargarMisCitas() {
   const cont = document.getElementById('appts-list');
@@ -733,15 +734,26 @@ async function cargarMisCitas() {
   }
 }
 
+function esPasada(c) {
+  const [y, m, d] = c.fecha.split('-').map(Number);
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  return new Date(y, m - 1, d) < hoy;
+}
+
 function renderMisCitas() {
   const cont = document.getElementById('appts-list');
-  let lista = _misCitas;
-  if (_filtroCitas !== 'todas') lista = lista.filter(c => c.estado === _filtroCitas);
+  let lista = _misCitas.slice();
+
+  if (_filtroCitas === 'proximas') lista = lista.filter(c => c.estado !== 'cancelada' && !esPasada(c));
+  else if (_filtroCitas === 'pasadas') lista = lista.filter(c => c.estado !== 'cancelada' && esPasada(c));
+  else if (_filtroCitas === 'cancelada') lista = lista.filter(c => c.estado === 'cancelada');
+  /* 'todas' no filtra */
 
   if (!lista.length) {
+    const etiqueta = { proximas: 'próximas', pasadas: 'pasadas', cancelada: 'canceladas', todas: '' }[_filtroCitas] || '';
     cont.innerHTML = `<div class="empty-state">
       <div class="empty-state__icon"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="24" height="22" rx="3"/><line x1="22" y1="3" x2="22" y2="9"/><line x1="10" y1="3" x2="10" y2="9"/></svg></div>
-      <h3>No tienes citas ${_filtroCitas === 'todas' ? '' : _filtroCitas + 's'}</h3>
+      <h3>No tienes citas ${etiqueta}</h3>
       <p>Cuando agendes una cita aparecerá aquí.</p>
       <button class="btn btn--coral btn--lg" data-go="5">Agendar una cita</button>
     </div>`;
@@ -751,6 +763,11 @@ function renderMisCitas() {
   cont.innerHTML = lista.map(c => {
     const [y, m, d] = c.fecha.split('-').map(Number);
     const cancelada = c.estado === 'cancelada';
+    const pasada = esPasada(c);
+    const reprogramada = c.estado === 'reprogramada';
+    const estadoLabel = cancelada ? 'Cancelada' : (reprogramada ? 'Reprogramada' : 'Confirmada');
+    const estadoColor = cancelada ? 'red' : (reprogramada ? 'amber' : 'green');
+    const puedeGestionar = !cancelada && !pasada;
     return `<div class="appt-item" style="${cancelada ? 'opacity:.65' : ''}">
       <div class="appt-item__date" style="${cancelada ? 'background:var(--ink-100);color:var(--ink-400)' : ''}">
         <div class="appt-item__day">${d}</div>
@@ -762,12 +779,13 @@ function renderMisCitas() {
         <div class="appt-item__meta">
           <div><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="6"/><path d="M7 3v4l3 2"/></svg> ${c.hora}</div>
           <div><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-7-8-13a8 8 0 1116 0c0 6-8 13-8 13z"/><circle cx="12" cy="9" r="3"/></svg> ${c.sede}</div>
-          <div><span class="badge badge--${cancelada ? 'red' : 'green'}">${cancelada ? 'Cancelada' : 'Confirmada'}</span></div>
+          <div><span class="badge badge--${estadoColor}">${estadoLabel}</span></div>
           <div style="color:var(--ink-400)">${c.id}</div>
         </div>
       </div>
       <div class="appt-item__actions">
-        ${cancelada ? '' : `<button class="btn btn--secondary" data-cancelar="${c.id}">Cancelar</button>`}
+        ${puedeGestionar ? `<button class="btn btn--secondary" data-reprogramar="${c.id}">Reprogramar</button>
+        <button class="btn btn--secondary" data-cancelar="${c.id}">Cancelar</button>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -785,6 +803,10 @@ function renderMisCitas() {
       }
     });
   });
+
+  cont.querySelectorAll('[data-reprogramar]').forEach(btn => {
+    btn.addEventListener('click', () => abrirReprogramacion(btn.dataset.reprogramar));
+  });
 }
 
 document.querySelectorAll('#screen-10 .appt-tabs .filter-pill').forEach(pill => {
@@ -797,9 +819,165 @@ document.querySelectorAll('#screen-10 .appt-tabs .filter-pill').forEach(pill => 
 });
 
 /* ================================================================== */
-/*  INICIALIZACIÓN                                                     */
+/*  HU-08 — REPROGRAMACIÓN DE CITA                                     */
 /* ================================================================== */
-cargarSesion();
-if (App.usuario) {
-  document.getElementById('login-email').value = App.usuario.email || '';
+let _reproCita = null;
+let _reproSel = { fecha: null, hora: null };
+let _reproBase = null;
+
+function abrirReprogramacion(citaId) {
+  _reproCita = _misCitas.find(c => c.id === citaId);
+  if (!_reproCita) return;
+  _reproSel = { fecha: null, hora: null };
+  _reproBase = new Date(); _reproBase.setHours(0, 0, 0, 0);
+  document.getElementById('repro-info').innerHTML =
+    `Cita actual: <strong>${_reproCita.medicoNombre}</strong> · ${fmtFechaCorta(_reproCita.fecha)} a las ${_reproCita.hora}. Elige nueva fecha y hora.`;
+  renderReproSemana();
+  const dias = proximosDias(_reproBase, 7);
+  reproSeleccionarDia(isoLocal(dias[0]), dias[0]);
+  document.getElementById('repro-modal').classList.add('show');
+}
+
+function renderReproSemana() {
+  const dias = proximosDias(_reproBase, 7);
+  const week = document.getElementById('repro-week');
+  week.innerHTML = dias.map(d => {
+    const iso = isoLocal(d);
+    const finde = d.getDay() === 0 || d.getDay() === 6;
+    return `<div class="cal-day ${finde ? 'disabled' : ''} ${iso === _reproSel.fecha ? 'selected' : ''}" data-iso="${iso}">
+      <div class="cal-day__name">${DIAS[d.getDay()]}</div>
+      <div class="cal-day__num">${d.getDate()}</div>
+    </div>`;
+  }).join('');
+  week.querySelectorAll('.cal-day:not(.disabled)').forEach(el => {
+    el.addEventListener('click', () => {
+      const [y, mo, da] = el.dataset.iso.split('-').map(Number);
+      reproSeleccionarDia(el.dataset.iso, new Date(y, mo - 1, da));
+    });
+  });
+}
+
+async function reproSeleccionarDia(iso, dateObj) {
+  _reproSel.fecha = iso; _reproSel.hora = null;
+  document.querySelectorAll('#repro-week .cal-day').forEach(d => d.classList.toggle('selected', d.dataset.iso === iso));
+  const am = document.getElementById('repro-am'), pm = document.getElementById('repro-pm');
+  am.innerHTML = pm.innerHTML = '<span class="spinner" style="border-color:var(--ink-200);border-top-color:var(--teal-500)"></span>';
+  try {
+    const disp = await api(`/api/disponibilidad?medicoId=${encodeURIComponent(_reproCita.medicoId)}&fecha=${iso}`);
+    const render = (slots) => slots.map(s => s.estado === 'ocupado'
+      ? `<div class="time-slot time-slot--busy">${s.hora}</div>`
+      : `<div class="time-slot time-slot--free" data-hora="${s.hora}">${s.hora}</div>`).join('');
+    am.innerHTML = render(disp.manana) || '<span style="color:var(--ink-400);font-size:13px">Sin cupos</span>';
+    pm.innerHTML = render(disp.tarde) || '<span style="color:var(--ink-400);font-size:13px">Sin cupos</span>';
+    document.querySelectorAll('#repro-am .time-slot--free, #repro-pm .time-slot--free').forEach(slot => {
+      slot.addEventListener('click', function () {
+        document.querySelectorAll('#repro-modal .time-slot--selected').forEach(s => { s.classList.remove('time-slot--selected'); s.classList.add('time-slot--free'); });
+        this.classList.remove('time-slot--free'); this.classList.add('time-slot--selected');
+        _reproSel.hora = this.dataset.hora;
+      });
+    });
+  } catch (err) { am.innerHTML = pm.innerHTML = `<div style="color:var(--red-600)">${err.message}</div>`; }
+}
+
+document.getElementById('repro-cancel').addEventListener('click', () => document.getElementById('repro-modal').classList.remove('show'));
+document.getElementById('repro-ok').addEventListener('click', async function () {
+  if (!_reproSel.fecha || !_reproSel.hora) { toast('Selecciona un horario', 'Elige día y hora para reprogramar.', 'info'); return; }
+  setLoadingBtn(this, true);
+  try {
+    await api(`/api/citas/${_reproCita.id}/reprogramar`, { method: 'PATCH', body: JSON.stringify(_reproSel) });
+    setLoadingBtn(this, false);
+    document.getElementById('repro-modal').classList.remove('show');
+    toast('Cita reprogramada', `Tu cita quedó para el ${fmtFechaCorta(_reproSel.fecha)} a las ${_reproSel.hora}.`, 'ok');
+    cargarMisCitas();
+  } catch (err) {
+    setLoadingBtn(this, false);
+    toast('No se pudo reprogramar', err.message, 'err');
+  }
+});
+
+/* ================================================================== */
+/*  HU-10 + HU-11 — PANEL DEL MÉDICO                                   */
+/* ================================================================== */
+let _medAgenda = {};   // { dia: Set(horas) }
+let _medListaMedicos = [];
+
+async function cargarPanelMedico() {
+  const sel = document.getElementById('med-select');
+  if (!_medListaMedicos.length) {
+    _medListaMedicos = await api('/api/medicos');
+    sel.innerHTML = _medListaMedicos.map(m => `<option value="${m.id}">${m.nombre} — ${m.especialidad}</option>`).join('');
+    sel.addEventListener('change', onMedicoChange);
+    document.getElementById('med-dia').addEventListener('change', renderMedSlots);
+    const hoy = new Date();
+    document.getElementById('med-fecha').value = isoLocal(hoy);
+    document.getElementById('med-fecha').addEventListener('change', cargarCitasMedico);
+    document.getElementById('med-guardar').addEventListener('click', guardarAgenda);
+  }
+  await onMedicoChange();
+}
+
+async function onMedicoChange() {
+  await cargarAgendaMedico();
+  await cargarCitasMedico();
+  renderMedSlots();
+}
+
+function medActualId() { return document.getElementById('med-select').value; }
+
+async function cargarAgendaMedico() {
+  const { agenda } = await api(`/api/agenda/${medActualId()}`);
+  _medAgenda = {};
+  ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'].forEach(d => {
+    _medAgenda[d] = new Set(agenda && agenda[d] ? agenda[d] : (agenda ? [] : [...HORARIOS_MANANA, ...HORARIOS_TARDE]));
+  });
+}
+
+const HORARIOS_MANANA = ['8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM'];
+const HORARIOS_TARDE = ['2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM', '5:00 PM', '5:30 PM'];
+
+function renderMedSlots() {
+  const dia = document.getElementById('med-dia').value;
+  const set = _medAgenda[dia] || new Set();
+  const render = (slots, cont) => {
+    document.getElementById(cont).innerHTML = slots.map(h =>
+      `<div class="time-slot ${set.has(h) ? 'time-slot--selected' : 'time-slot--free'}" data-hora="${h}">${h}</div>`).join('');
+    document.querySelectorAll(`#${cont} .time-slot`).forEach(s => s.addEventListener('click', function () {
+      const h = this.dataset.hora;
+      if (set.has(h)) { set.delete(h); this.classList.remove('time-slot--selected'); this.classList.add('time-slot--free'); }
+      else { set.add(h); this.classList.add('time-slot--selected'); this.classList.remove('time-slot--free'); }
+    }));
+  };
+  render(HORARIOS_MANANA, 'med-slots-am');
+  render(HORARIOS_TARDE, 'med-slots-pm');
+}
+
+async function guardarAgenda() {
+  const agenda = {};
+  Object.keys(_medAgenda).forEach(d => { agenda[d] = [...HORARIOS_MANANA, ...HORARIOS_TARDE].filter(h => _medAgenda[d].has(h)); });
+  try {
+    await api(`/api/agenda/${medActualId()}`, { method: 'PUT', body: JSON.stringify({ agenda }) });
+    toast('Disponibilidad guardada', 'El calendario del paciente reflejará estas horas.', 'ok');
+  } catch (err) { toast('Error', err.message, 'err'); }
+}
+
+async function cargarCitasMedico() {
+  const cont = document.getElementById('med-citas');
+  const fecha = document.getElementById('med-fecha').value;
+  cont.innerHTML = '<div class="loading-block"><span class="spinner"></span></div>';
+  try {
+    const citas = await api(`/api/medicos/${medActualId()}/citas?fecha=${fecha}`);
+    if (!citas.length) {
+      cont.innerHTML = `<div class="empty-state" style="padding:40px 10px"><h3>Sin citas</h3><p>No hay citas para esta fecha.</p></div>`;
+      return;
+    }
+    cont.innerHTML = citas.map(c => `
+      <div class="appt-item" style="margin-bottom:10px">
+        <div class="appt-item__date"><div class="appt-item__day">${c.hora.split(':')[0]}</div><div class="appt-item__month">${c.hora.includes('PM') ? 'PM' : 'AM'}</div></div>
+        <div class="appt-item__info">
+          <div class="appt-item__doctor">${c.hora} · Paciente</div>
+          <div class="appt-item__spec">${c.especialidad} · ${c.modalidad}</div>
+          <div class="appt-item__meta"><div><span class="badge badge--${c.estado === 'reprogramada' ? 'amber' : 'green'}">${c.estado}</span></div><div style="color:var(--ink-400)">${c.id}</div></div>
+        </div>
+      </div>`).join('');
+  } catch (err) { cont.innerHTML = `<div class="empty-state"><p>${err.message}</p></div>`; }
 }

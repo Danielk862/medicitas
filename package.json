@@ -1,6 +1,6 @@
 {
-  "name": "medicitas-sprint2",
-  "version": "2.0.0",
+  "name": "medicitas",
+  "version": "1.0.1",
   "description": "MediCitas — Prototipo funcional Sprint 2. Plataforma de reservas de citas médicas con persistencia en archivos planos JSON.",
   "main": "server.js",
   "type": "commonjs",
