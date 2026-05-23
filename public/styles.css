@@ -132,7 +132,7 @@
     border-bottom: 1px solid var(--ink-200);
     padding: 18px 48px;
     display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 60px; z-index: 50;
+    position: static; top: 60px; z-index: 50;
   }
   .app-logo {
     display: flex; align-items: center; gap: 12px;
