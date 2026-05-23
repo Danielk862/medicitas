@@ -55,12 +55,33 @@ http://localhost:3000
 
 ### 👤 Cuentas de prueba
 
-| Perfil   | Correo                          | Contraseña    |
-|----------|---------------------------------|---------------|
-| Paciente | maria.gomez@correo.com          | Medicitas2026 |
-| Médico   | laura.restrepo@medicitas.com    | Medicitas2026 |
+Contraseña para todas las cuentas: **`Medicitas2026`**
 
-Al iniciar sesión (o registrarte) debes elegir el **tipo de perfil**:
+**Paciente**
+
+| Correo                   |
+|--------------------------|
+| maria.gomez@correo.com   |
+
+**Médicos** (13 cuentas)
+
+| Nombre                  | Especialidad       | Correo                              |
+|-------------------------|--------------------|-------------------------------------|
+| Dra. Laura Restrepo     | Cardiología        | laura.restrepo@medicitas.com        |
+| Dr. Carlos Mejía        | Cardiología        | carlos.mejia@medicitas.com          |
+| Dra. Ana Salazar        | Cardiología        | ana.salazar@medicitas.com           |
+| Dr. Julián Bedoya       | Cardiología        | julian.bedoya@medicitas.com         |
+| Dra. Marcela Patiño     | Oftalmología       | marcela.patino@medicitas.com        |
+| Dr. Ricardo Henao       | Oftalmología       | ricardo.henao@medicitas.com         |
+| Dra. Valentina Torres   | Dermatología       | valentina.torres@medicitas.com      |
+| Dr. Daniel Ospina       | Dermatología       | daniel.ospina@medicitas.com         |
+| Dr. Luis Gaviria        | Neurología         | luis.gaviria@medicitas.com          |
+| Dra. Sara Cardona       | Pediatría          | sara.cardona@medicitas.com          |
+| Dr. Felipe Arango       | Medicina interna   | felipe.arango@medicitas.com         |
+| Dra. Carolina Gil       | Ginecología        | carolina.gil@medicitas.com          |
+| Dr. Andrés Vélez        | Ortopedia          | andres.velez@medicitas.com          |
+
+Al iniciar sesión debes elegir el **tipo de perfil**:
 - **Paciente**: agenda, reprograma, cancela y consulta el historial de sus citas.
 - **Médico**: solo ve y configura **su propia** disponibilidad y su agenda del día.
 

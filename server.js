@@ -152,9 +152,6 @@ app.post('/api/registro', (req, res) => {
   }
 
   const perfil = tipo === 'medico' ? 'medico' : 'paciente';
-  if (perfil === 'medico' && !medicoId) {
-    return res.status(400).json({ error: 'Selecciona el perfil médico al que perteneces.' });
-  }
 
   const usuarios = leer('usuarios.json');
   if (usuarios.some(u => u.email.toLowerCase() === email.toLowerCase())) {

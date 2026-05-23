@@ -255,25 +255,10 @@ document.addEventListener('keydown', (e) => {
 /* ================================================================== */
 /*  TIPO DE PERFIL (paciente / médico) en registro y login            */
 /* ================================================================== */
-let _medicosRegCargados = false;
-
-async function cargarMedicosRegistro() {
-  if (_medicosRegCargados) return;
-  try {
-    const medicos = await api('/api/medicos');
-    document.getElementById('reg-medico').innerHTML =
-      medicos.map(m => `<option value="${m.id}">${m.nombre} — ${m.especialidad}</option>`).join('');
-    _medicosRegCargados = true;
-  } catch (e) {}
-}
-
 document.querySelectorAll('[data-reg-tipo]').forEach(btn => {
   btn.addEventListener('click', function () {
     App.regTipo = this.dataset.regTipo;
     document.querySelectorAll('[data-reg-tipo]').forEach(b => b.classList.toggle('active', b === this));
-    const grupo = document.getElementById('reg-medico-group');
-    if (App.regTipo === 'medico') { grupo.style.display = ''; cargarMedicosRegistro(); }
-    else { grupo.style.display = 'none'; }
   });
 });
 
@@ -304,7 +289,7 @@ document.getElementById('reg-submit').addEventListener('click', async function (
     email: document.getElementById('reg-email').value.trim(),
     password: document.getElementById('reg-password').value,
     tipo: App.regTipo,
-    medicoId: App.regTipo === 'medico' ? document.getElementById('reg-medico').value : null
+    medicoId: null
   };
 
   if (!body.nombre || !body.apellido || !body.email || !body.password) {
@@ -377,7 +362,7 @@ async function cargarDashboard() {
 
     let proximaHTML;
     if (proxima) {
-      const [y, m, d] = proxima.fecha.split('-').map(Number);
+      const [, m, d] = proxima.fecha.split('-').map(Number);
       proximaHTML = `
         <div class="next-appt">
           <div class="next-appt__date">
@@ -829,7 +814,7 @@ function renderMisCitas() {
   }
 
   cont.innerHTML = lista.map(c => {
-    const [y, m, d] = c.fecha.split('-').map(Number);
+    const [, m, d] = c.fecha.split('-').map(Number);
     const cancelada = c.estado === 'cancelada';
     const pasada = esPasada(c);
     const reprogramada = c.estado === 'reprogramada';
