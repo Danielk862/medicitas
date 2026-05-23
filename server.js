@@ -75,16 +75,6 @@ app.get('/api/medicos/:id', (req, res) => {
 const HORARIOS_MANANA = ['7:00 AM', '7:30 AM','8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM'];
 const HORARIOS_TARDE  = ['1:00 PM', '1:30 PM','2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM', '5:00 PM', '5:30 PM', '6:00 PM', '6:30 PM', '7:00 PM'];
 
-/* "Ocupados base" deterministas por médico para que el calendario no quede vacío */
-function ocupadosBase(medicoId, fecha) {
-  const semilla = (medicoId + fecha).split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  const todos = [...HORARIOS_MANANA, ...HORARIOS_TARDE];
-  const ocupados = [];
-  for (let i = 0; i < todos.length; i++) {
-    if ((semilla + i * 7) % 3 === 0) ocupados.push(todos[i]);
-  }
-  return ocupados;
-}
 
 app.get('/api/disponibilidad', (req, res) => {
   const { medicoId, fecha } = req.query;
@@ -98,14 +88,7 @@ app.get('/api/disponibilidad', (req, res) => {
   /* Horarios ocupados por citas activas (confirmadas o reprogramadas) */
   const ocupadosPorCitas = citasDia.filter(c => c.estado !== 'cancelada').map(c => c.hora);
 
-  /* Horarios que tuvieron una cita CANCELADA: se liberan explícitamente,
-     incluso si pertenecían a los "ocupados base". Así cancelar SIEMPRE libera. */
-  const liberados = new Set(citasDia.filter(c => c.estado === 'cancelada').map(c => c.hora));
-
-  const ocupados = new Set([
-    ...ocupadosBase(medicoId, fecha).filter(h => !liberados.has(h)),
-    ...ocupadosPorCitas
-  ]);
+  const ocupados = new Set(ocupadosPorCitas);
 
   /* HU-10: si el médico configuró su agenda, solo se ofrecen las franjas
      que él habilitó para ese día de la semana. */
