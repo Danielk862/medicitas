@@ -7,6 +7,32 @@
     "telefono": "+57 300 123 4567",
     "email": "maria.gomez@correo.com",
     "password": "Medicitas2026",
+    "tipo": "paciente",
+    "medicoId": null,
     "creadoEn": "2026-05-01T09:00:00.000Z"
+  },
+  {
+    "id": "u-laura",
+    "nombre": "Laura",
+    "apellido": "Restrepo",
+    "identificacion": "43178902",
+    "telefono": "+57 301 555 1212",
+    "email": "laura.restrepo@medicitas.com",
+    "password": "Medicitas2026",
+    "tipo": "medico",
+    "medicoId": "lr",
+    "creadoEn": "2026-05-01T09:00:00.000Z"
+  },
+  {
+    "id": "u-1779553088447",
+    "nombre": "Daniel Andres",
+    "apellido": "Gomez",
+    "identificacion": "1037571662",
+    "telefono": "3245702742",
+    "email": "slipdany@hotmail.com",
+    "password": "Daniel2021*",
+    "tipo": "medico",
+    "medicoId": "cm",
+    "creadoEn": "2026-05-23T16:18:08.447Z"
   }
 ]

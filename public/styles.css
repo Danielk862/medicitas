@@ -156,6 +156,7 @@
     padding: 8px 14px; border-radius: 8px;
     font-size: 14px; color: var(--ink-700); font-weight: 500;
     transition: all 0.18s;
+    cursor: pointer;
   }
   .app-nav__item:hover { background: var(--ink-100); }
   .app-nav__item.active { background: var(--teal-100); color: var(--teal-800); }
@@ -178,6 +179,9 @@
     padding: 12px 22px; border-radius: 10px;
     font-size: 14px; font-weight: 600;
     transition: all 0.18s ease;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
   }
   .btn--primary {
     background: var(--teal-700); color: var(--white);
@@ -1207,6 +1211,16 @@
   .appts-head p { color: var(--ink-500); }
 
   .appt-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .appt-tabs .filter-pill {
+    padding: 8px 18px; border-radius: 999px;
+    background: var(--white); border: 1.5px solid var(--ink-200);
+    font-size: 13px; font-weight: 500; color: var(--teal-700);
+    cursor: pointer; transition: all 0.18s; text-decoration: none;
+    display: inline-block;
+  }
+  .appt-tabs .filter-pill:hover, .appt-tabs .filter-pill.active {
+    background: var(--teal-700); color: var(--white); border-color: var(--teal-700);
+  }
 
   .appt-item {
     background: var(--white); border: 1px solid var(--ink-100); border-radius: var(--radius-lg);
@@ -1250,9 +1264,84 @@
     background: var(--white); border-radius: var(--radius-lg); max-width: 440px; width: 100%;
     padding: 30px; box-shadow: var(--shadow-lg); animation: toast-in .3s ease;
   }
+  .modal--scroll {
+    max-height: 88vh; overflow-y: auto;
+  }
+  .modal-overlay.modal-overlay--top {
+    align-items: flex-start; padding-top: 4vh; padding-bottom: 4vh; overflow-y: auto;
+  }
   .modal h3 { font-family: var(--font-display); font-size: 22px; color: var(--ink-900); margin-bottom: 10px; }
   .modal p { color: var(--ink-500); margin-bottom: 22px; }
   .modal__actions { display: flex; gap: 10px; }
 
   /* Spinner dentro de botón mantiene texto centrado */
   .btn[disabled] { opacity: .7; cursor: not-allowed; }
+
+  /* ====================================================== */
+  /* SELECTOR DE TIPO DE PERFIL (paciente / médico)         */
+  /* ====================================================== */
+  .profile-toggle {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .profile-toggle__opt {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px; border-radius: 10px;
+    border: 1.5px solid var(--ink-200); background: var(--white);
+    color: var(--ink-700); font-weight: 600; font-size: 14px;
+    cursor: pointer; transition: all 0.18s; font-family: inherit;
+  }
+  .profile-toggle__opt:hover {
+    border-color: var(--teal-500); background: var(--teal-50);
+  }
+  .profile-toggle__opt.active {
+    border-color: var(--teal-700); background: var(--teal-700); color: var(--white);
+    box-shadow: 0 6px 16px rgba(17,122,130,0.25);
+  }
+
+  /* Botón "Volver al inicio" en login/registro */
+  .auth-back {
+    padding: 6px 10px; margin-bottom: 14px;
+    color: var(--ink-500); font-size: 13px; font-weight: 600;
+    align-self: flex-start;
+  }
+  .auth-back:hover { color: var(--teal-700); background: var(--teal-50); }
+
+  /* Tarjeta de nombre del médico (cuando el panel es de su propio perfil) */
+  .med-self-card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 20px; border-radius: var(--radius-lg);
+    background: var(--teal-50); border: 1px solid var(--teal-100);
+  }
+  .med-self-card__avatar {
+    width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
+    background: var(--teal-700); color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px;
+  }
+  .med-self-card__name { font-weight: 700; color: var(--ink-900); font-size: 16px; }
+  .med-self-card__spec { color: var(--ink-500); font-size: 13px; }
+
+  /* ====================================================== */
+  /* CURSOR: garantizar "mano" en todo elemento clickeable  */
+  /* ====================================================== */
+  [data-go],
+  [data-medico],
+  [data-cancelar],
+  [data-reprogramar],
+  [data-spec],
+  [data-filtro],
+  [data-reg-tipo],
+  [data-login-tipo],
+  .app-logo,
+  .spec-card,
+  .doc-card,
+  .quick-action,
+  .filter-pill,
+  .proto-bar__btn,
+  select.input,
+  input[type="date"],
+  input[type="checkbox"],
+  label[for],
+  a {
+    cursor: pointer;
+  }

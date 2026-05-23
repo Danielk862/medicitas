@@ -11,12 +11,16 @@ const App = {
   usuario: null,            // usuario en sesión
   especialidadActual: null, // {id, nombre}
   medicoActual: null,       // objeto médico
+  regTipo: 'paciente',      // tipo elegido en el registro
+  loginTipo: 'paciente',    // tipo elegido en el login
   seleccion: {              // selección de agendamiento en curso
     fecha: null,
     fechaTexto: null,
     hora: null
   }
 };
+
+function esMedico() { return App.usuario && App.usuario.tipo === 'medico'; }
 
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 const DIAS_LARGO = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
@@ -126,9 +130,20 @@ function cargarSesion() {
     if (u) App.usuario = JSON.parse(u);
   } catch (e) {}
 }
+function resetLoginForm() {
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
+  ocultarMensaje('login-msg');
+  App.loginTipo = 'paciente';
+  document.querySelectorAll('[data-login-tipo]').forEach(b => {
+    b.classList.toggle('active', b.dataset.loginTipo === 'paciente');
+  });
+}
+
 function cerrarSesion() {
   App.usuario = null;
   try { sessionStorage.removeItem('medicitas_user'); } catch (e) {}
+  resetLoginForm();
   showScreen(1);
   toast('Sesión cerrada', 'Has salido de tu cuenta correctamente.', 'info');
 }
@@ -142,12 +157,16 @@ function iniciales(usuario) {
 /* ------------------------------------------------------------------ */
 function renderHeaders(activo) {
   const u = App.usuario || { nombre: 'Invitado', apellido: '' };
-  const nav = [
-    { label: 'Inicio', go: 4 },
-    { label: 'Especialidades', go: 5 },
-    { label: 'Mis citas', go: 10 },
-    { label: 'Panel médico', go: 11 }
-  ];
+  const nav = esMedico()
+    ? [
+        { label: 'Panel médico', go: 11 }
+      ]
+    : [
+        { label: 'Inicio', go: 4 },
+        { label: 'Especialidades', go: 5 },
+        { label: 'Mis citas', go: 10 }
+      ];
+  const rolLabel = esMedico() ? 'Médico' : 'Paciente';
   document.querySelectorAll('[data-app-header]').forEach(header => {
     header.innerHTML = `
       <div class="app-logo">
@@ -161,7 +180,7 @@ function renderHeaders(activo) {
       </div>
       <div class="app-user">
         <div class="app-user__avatar">${iniciales(u)}</div>
-        <div class="app-user__name">${u.nombre} ${(u.apellido || '').charAt(0)}.</div>
+        <div class="app-user__name">${u.nombre} ${(u.apellido || '').charAt(0)}. · ${rolLabel}</div>
         <button class="btn btn--ghost" style="margin-left:10px;padding:8px 12px" onclick="cerrarSesion()">Salir</button>
       </div>`;
   });
@@ -184,6 +203,19 @@ function showScreen(num) {
     num = 3;
   }
 
+  /* Control de acceso por rol (solo con sesión iniciada) */
+  if (App.usuario) {
+    if (esMedico() && num >= 4 && num !== 11) {
+      /* El médico solo usa su panel */
+      num = 11;
+    }
+    if (!esMedico() && num === 11) {
+      /* El paciente no puede ver el panel del médico */
+      toast('Acceso restringido', 'El panel del médico es solo para perfiles médicos.', 'info');
+      num = 4;
+    }
+  }
+
   document.querySelectorAll('.screen-wrap').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + num)?.classList.add('active');
   document.querySelectorAll('.proto-bar__btn').forEach(b => {
@@ -191,6 +223,7 @@ function showScreen(num) {
   });
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
+  if (num === 3) resetLoginForm();
   if (num >= 4) renderHeaders(SCREEN_TITLES[num] || '');
 
   /* Cargar datos según la pantalla */
@@ -220,6 +253,38 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ================================================================== */
+/*  TIPO DE PERFIL (paciente / médico) en registro y login            */
+/* ================================================================== */
+let _medicosRegCargados = false;
+
+async function cargarMedicosRegistro() {
+  if (_medicosRegCargados) return;
+  try {
+    const medicos = await api('/api/medicos');
+    document.getElementById('reg-medico').innerHTML =
+      medicos.map(m => `<option value="${m.id}">${m.nombre} — ${m.especialidad}</option>`).join('');
+    _medicosRegCargados = true;
+  } catch (e) {}
+}
+
+document.querySelectorAll('[data-reg-tipo]').forEach(btn => {
+  btn.addEventListener('click', function () {
+    App.regTipo = this.dataset.regTipo;
+    document.querySelectorAll('[data-reg-tipo]').forEach(b => b.classList.toggle('active', b === this));
+    const grupo = document.getElementById('reg-medico-group');
+    if (App.regTipo === 'medico') { grupo.style.display = ''; cargarMedicosRegistro(); }
+    else { grupo.style.display = 'none'; }
+  });
+});
+
+document.querySelectorAll('[data-login-tipo]').forEach(btn => {
+  btn.addEventListener('click', function () {
+    App.loginTipo = this.dataset.loginTipo;
+    document.querySelectorAll('[data-login-tipo]').forEach(b => b.classList.toggle('active', b === this));
+  });
+});
+
+/* ================================================================== */
 /*  REGISTRO                                                           */
 /* ================================================================== */
 document.getElementById('reg-password').addEventListener('input', function () {
@@ -237,7 +302,9 @@ document.getElementById('reg-submit').addEventListener('click', async function (
     identificacion: document.getElementById('reg-identificacion').value.trim(),
     telefono: document.getElementById('reg-telefono').value.trim(),
     email: document.getElementById('reg-email').value.trim(),
-    password: document.getElementById('reg-password').value
+    password: document.getElementById('reg-password').value,
+    tipo: App.regTipo,
+    medicoId: App.regTipo === 'medico' ? document.getElementById('reg-medico').value : null
   };
 
   if (!body.nombre || !body.apellido || !body.email || !body.password) {
@@ -254,9 +321,9 @@ document.getElementById('reg-submit').addEventListener('click', async function (
   try {
     const { usuario } = await api('/api/registro', { method: 'POST', body: JSON.stringify(body) });
     guardarSesion(usuario);
-    toast('¡Cuenta creada!', `Bienvenida, ${usuario.nombre}. Tu cuenta quedó guardada.`, 'ok');
+    toast('¡Cuenta creada!', `Bienvenido/a, ${usuario.nombre}. Tu cuenta quedó guardada.`, 'ok');
     setLoadingBtn(this, false);
-    showScreen(4);
+    showScreen(usuario.tipo === 'medico' ? 11 : 4);
   } catch (err) {
     setLoadingBtn(this, false);
     mostrarMensaje('reg-msg', err.message, 'err');
@@ -270,7 +337,8 @@ document.getElementById('login-submit').addEventListener('click', async function
   ocultarMensaje('login-msg');
   const body = {
     email: document.getElementById('login-email').value.trim(),
-    password: document.getElementById('login-password').value
+    password: document.getElementById('login-password').value,
+    tipo: App.loginTipo
   };
   if (!body.email || !body.password) {
     return mostrarMensaje('login-msg', 'Ingresa tu correo y contraseña.', 'err');
@@ -282,7 +350,7 @@ document.getElementById('login-submit').addEventListener('click', async function
     guardarSesion(usuario);
     toast('Bienvenido', `Hola de nuevo, ${usuario.nombre}.`, 'ok');
     setLoadingBtn(this, false);
-    showScreen(4);
+    showScreen(usuario.tipo === 'medico' ? 11 : 4);
   } catch (err) {
     setLoadingBtn(this, false);
     mostrarMensaje('login-msg', err.message, 'err');
@@ -829,37 +897,25 @@ function abrirReprogramacion(citaId) {
   _reproCita = _misCitas.find(c => c.id === citaId);
   if (!_reproCita) return;
   _reproSel = { fecha: null, hora: null };
-  _reproBase = new Date(); _reproBase.setHours(0, 0, 0, 0);
   document.getElementById('repro-info').innerHTML =
-    `Cita actual: <strong>${_reproCita.medicoNombre}</strong> · ${fmtFechaCorta(_reproCita.fecha)} a las ${_reproCita.hora}. Elige nueva fecha y hora.`;
-  renderReproSemana();
-  const dias = proximosDias(_reproBase, 7);
-  reproSeleccionarDia(isoLocal(dias[0]), dias[0]);
-  document.getElementById('repro-modal').classList.add('show');
+    `Cita actual: <strong>${_reproCita.medicoNombre}</strong> · ${fmtFechaCorta(_reproCita.fecha)} a las ${_reproCita.hora}. Elige la nueva fecha y hora.`;
+
+  const inp = document.getElementById('repro-fecha');
+  /* Por defecto, el próximo día hábil; mínimo hoy */
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const prox = new Date(hoy); prox.setDate(prox.getDate() + 1);
+  while (prox.getDay() === 0 || prox.getDay() === 6) prox.setDate(prox.getDate() + 1);
+  inp.min = isoLocal(hoy);
+  inp.value = isoLocal(prox);
+  inp.onchange = () => reproSeleccionarDia(inp.value);
+
+  reproSeleccionarDia(inp.value);
+  const overlay = document.getElementById('repro-modal');
+  overlay.classList.add('show', 'modal-overlay--top');
 }
 
-function renderReproSemana() {
-  const dias = proximosDias(_reproBase, 7);
-  const week = document.getElementById('repro-week');
-  week.innerHTML = dias.map(d => {
-    const iso = isoLocal(d);
-    const finde = d.getDay() === 0 || d.getDay() === 6;
-    return `<div class="cal-day ${finde ? 'disabled' : ''} ${iso === _reproSel.fecha ? 'selected' : ''}" data-iso="${iso}">
-      <div class="cal-day__name">${DIAS[d.getDay()]}</div>
-      <div class="cal-day__num">${d.getDate()}</div>
-    </div>`;
-  }).join('');
-  week.querySelectorAll('.cal-day:not(.disabled)').forEach(el => {
-    el.addEventListener('click', () => {
-      const [y, mo, da] = el.dataset.iso.split('-').map(Number);
-      reproSeleccionarDia(el.dataset.iso, new Date(y, mo - 1, da));
-    });
-  });
-}
-
-async function reproSeleccionarDia(iso, dateObj) {
+async function reproSeleccionarDia(iso) {
   _reproSel.fecha = iso; _reproSel.hora = null;
-  document.querySelectorAll('#repro-week .cal-day').forEach(d => d.classList.toggle('selected', d.dataset.iso === iso));
   const am = document.getElementById('repro-am'), pm = document.getElementById('repro-pm');
   am.innerHTML = pm.innerHTML = '<span class="spinner" style="border-color:var(--ink-200);border-top-color:var(--teal-500)"></span>';
   try {
@@ -879,14 +935,14 @@ async function reproSeleccionarDia(iso, dateObj) {
   } catch (err) { am.innerHTML = pm.innerHTML = `<div style="color:var(--red-600)">${err.message}</div>`; }
 }
 
-document.getElementById('repro-cancel').addEventListener('click', () => document.getElementById('repro-modal').classList.remove('show'));
+document.getElementById('repro-cancel').addEventListener('click', () => document.getElementById('repro-modal').classList.remove('show', 'modal-overlay--top'));
 document.getElementById('repro-ok').addEventListener('click', async function () {
   if (!_reproSel.fecha || !_reproSel.hora) { toast('Selecciona un horario', 'Elige día y hora para reprogramar.', 'info'); return; }
   setLoadingBtn(this, true);
   try {
     await api(`/api/citas/${_reproCita.id}/reprogramar`, { method: 'PATCH', body: JSON.stringify(_reproSel) });
     setLoadingBtn(this, false);
-    document.getElementById('repro-modal').classList.remove('show');
+    document.getElementById('repro-modal').classList.remove('show', 'modal-overlay--top');
     toast('Cita reprogramada', `Tu cita quedó para el ${fmtFechaCorta(_reproSel.fecha)} a las ${_reproSel.hora}.`, 'ok');
     cargarMisCitas();
   } catch (err) {
@@ -903,6 +959,9 @@ let _medListaMedicos = [];
 
 async function cargarPanelMedico() {
   const sel = document.getElementById('med-select');
+  const grupo = document.getElementById('med-select-group');
+  const tarjeta = document.getElementById('med-nombre-actual');
+
   if (!_medListaMedicos.length) {
     _medListaMedicos = await api('/api/medicos');
     sel.innerHTML = _medListaMedicos.map(m => `<option value="${m.id}">${m.nombre} — ${m.especialidad}</option>`).join('');
@@ -913,6 +972,26 @@ async function cargarPanelMedico() {
     document.getElementById('med-fecha').addEventListener('change', cargarCitasMedico);
     document.getElementById('med-guardar').addEventListener('click', guardarAgenda);
   }
+
+  /* Punto 4: el médico solo gestiona su propia disponibilidad */
+  if (esMedico()) {
+    const yo = _medListaMedicos.find(m => m.id === App.usuario.medicoId) || _medListaMedicos[0];
+    if (yo) sel.value = yo.id;
+    grupo.style.display = 'none';
+    tarjeta.style.display = '';
+    tarjeta.innerHTML = yo ? `
+      <div class="med-self-card">
+        <div class="med-self-card__avatar">${yo.iniciales}</div>
+        <div>
+          <div class="med-self-card__name">${yo.nombre}</div>
+          <div class="med-self-card__spec">${yo.especialidad} · Sede ${yo.sede}</div>
+        </div>
+      </div>` : '';
+  } else {
+    grupo.style.display = '';
+    tarjeta.style.display = 'none';
+  }
+
   await onMedicoChange();
 }
 
@@ -981,3 +1060,8 @@ async function cargarCitasMedico() {
       </div>`).join('');
   } catch (err) { cont.innerHTML = `<div class="empty-state"><p>${err.message}</p></div>`; }
 }
+
+/* ================================================================== */
+/*  INICIALIZACIÓN                                                     */
+/* ================================================================== */
+cargarSesion();

@@ -182,8 +182,29 @@
     </div>
     <div class="auth-form">
       <div class="auth-form__head">
+        <button class="btn btn--ghost auth-back" data-go="1">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Volver al inicio
+        </button>
         <h1 class="auth-form__title">Crea tu cuenta</h1>
         <p class="auth-form__sub">¿Ya tienes una cuenta? <a href="#" data-go="3">Inicia sesión</a></p>
+      </div>
+      <div class="input-group">
+        <label>Tipo de perfil</label>
+        <div class="profile-toggle">
+          <button type="button" class="profile-toggle__opt active" data-reg-tipo="paciente">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0116 0"/></svg>
+            Paciente
+          </button>
+          <button type="button" class="profile-toggle__opt" data-reg-tipo="medico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 013 3v2a3 3 0 01-6 0V5a3 3 0 013-3z"/><path d="M6 9v3a6 6 0 0012 0V9"/><circle cx="18" cy="16" r="3"/></svg>
+            Médico
+          </button>
+        </div>
+      </div>
+      <div class="input-group" id="reg-medico-group" style="display:none">
+        <label>¿Qué médico eres?</label>
+        <select class="input" id="reg-medico"></select>
       </div>
       <div class="auth-grid">
         <div class="input-group">
@@ -245,14 +266,31 @@
         "Bienvenido de nuevo.<br/><em>Tu agenda te está esperando.</em>"
       </div>
       <div class="auth-side__footer">
-        <div class="auth-side__footer-label">Cuenta de prueba</div>
-        <div class="auth-side__footer-text">maria.gomez@correo.com · contraseña: Medicitas2026</div>
+        <div class="auth-side__footer-label">Cuentas de prueba</div>
+        <div class="auth-side__footer-text">Paciente: maria.gomez@correo.com<br/>Médico: laura.restrepo@medicitas.com<br/>Contraseña (ambas): Medicitas2026</div>
       </div>
     </div>
     <div class="auth-form">
       <div class="auth-form__head">
+        <button class="btn btn--ghost auth-back" data-go="1">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Volver al inicio
+        </button>
         <h1 class="auth-form__title">Bienvenido</h1>
         <p class="auth-form__sub">¿No tienes cuenta aún? <a href="#" data-go="2">Regístrate</a></p>
+      </div>
+      <div class="input-group">
+        <label>Tipo de perfil</label>
+        <div class="profile-toggle">
+          <button type="button" class="profile-toggle__opt active" data-login-tipo="paciente">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0116 0"/></svg>
+            Paciente
+          </button>
+          <button type="button" class="profile-toggle__opt" data-login-tipo="medico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 013 3v2a3 3 0 01-6 0V5a3 3 0 013-3z"/><path d="M6 9v3a6 6 0 0012 0V9"/><circle cx="18" cy="16" r="3"/></svg>
+            Médico
+          </button>
+        </div>
       </div>
       <div class="input-group">
         <label>Correo electrónico</label>
@@ -625,10 +663,10 @@
       <p>Gestiona, revisa o cancela tus citas médicas agendadas.</p>
     </div>
     <div class="appt-tabs">
-      <button class="filter-pill active" data-filtro="proximas">Próximas</button>
-      <button class="filter-pill" data-filtro="pasadas">Pasadas</button>
-      <button class="filter-pill" data-filtro="cancelada">Canceladas</button>
-      <button class="filter-pill" data-filtro="todas">Todas</button>
+      <a href="#" class="filter-pill active" data-filtro="proximas">Próximas</a>
+      <a href="#" class="filter-pill" data-filtro="pasadas">Pasadas</a>
+      <a href="#" class="filter-pill" data-filtro="cancelada">Canceladas</a>
+      <a href="#" class="filter-pill" data-filtro="todas">Todas</a>
     </div>
     <div id="appts-list">
       <div class="loading-block"><span class="spinner"></span><div style="margin-top:12px">Cargando tus citas…</div></div>
@@ -647,10 +685,11 @@
       <p>Revisa tu agenda del día y configura tus horarios de atención.</p>
     </div>
 
-    <div class="input-group" style="max-width:380px">
+    <div class="input-group" style="max-width:380px" id="med-select-group">
       <label>Selecciona el médico</label>
       <select class="input" id="med-select"></select>
     </div>
+    <div id="med-nombre-actual" style="display:none;margin-bottom:20px"></div>
 
     <div class="dash-grid" style="margin-top:8px">
       <div>
@@ -693,10 +732,13 @@
 <!-- MODAL DE REPROGRAMACIÓN (HU-08)                         -->
 <!-- ====================================================== -->
 <div class="modal-overlay" id="repro-modal">
-  <div class="modal" style="max-width:560px">
+  <div class="modal modal--scroll" style="max-width:520px">
     <h3>Reprogramar cita</h3>
     <p id="repro-info">—</p>
-    <div class="cal-week" id="repro-week" style="margin-bottom:14px"></div>
+    <div class="input-group">
+      <label>Selecciona la nueva fecha</label>
+      <input class="input" type="date" id="repro-fecha" />
+    </div>
     <div class="cal-section-title">Mañana</div>
     <div class="time-grid" id="repro-am"></div>
     <div class="cal-section-title">Tarde</div>

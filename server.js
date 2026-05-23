@@ -139,7 +139,7 @@ app.get('/api/disponibilidad', (req, res) => {
 /* ================================================================== */
 
 app.post('/api/registro', (req, res) => {
-  const { nombre, apellido, identificacion, telefono, email, password } = req.body;
+  const { nombre, apellido, identificacion, telefono, email, password, tipo, medicoId } = req.body;
 
   if (!nombre || !apellido || !email || !password) {
     return res.status(400).json({ error: 'Faltan campos obligatorios.' });
@@ -149,6 +149,11 @@ app.post('/api/registro', (req, res) => {
   }
   if (password.length < 8) {
     return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres.' });
+  }
+
+  const perfil = tipo === 'medico' ? 'medico' : 'paciente';
+  if (perfil === 'medico' && !medicoId) {
+    return res.status(400).json({ error: 'Selecciona el perfil médico al que perteneces.' });
   }
 
   const usuarios = leer('usuarios.json');
@@ -163,6 +168,8 @@ app.post('/api/registro', (req, res) => {
     telefono: telefono || '',
     email,
     password,
+    tipo: perfil,
+    medicoId: perfil === 'medico' ? medicoId : null,
     creadoEn: new Date().toISOString()
   };
   usuarios.push(nuevo);
@@ -173,7 +180,7 @@ app.post('/api/registro', (req, res) => {
 });
 
 app.post('/api/login', (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, tipo } = req.body;
   if (!email || !password) {
     return res.status(400).json({ error: 'Ingresa tu correo y contraseña.' });
   }
@@ -183,6 +190,13 @@ app.post('/api/login', (req, res) => {
 
   if (!usuario || usuario.password !== password) {
     return res.status(401).json({ error: 'Correo o contraseña incorrectos.' });
+  }
+
+  /* El tipo de perfil elegido debe coincidir con el de la cuenta */
+  const perfilUsuario = usuario.tipo || 'paciente';
+  if (tipo && tipo !== perfilUsuario) {
+    const otro = perfilUsuario === 'medico' ? 'médico' : 'paciente';
+    return res.status(403).json({ error: `Esta cuenta es de tipo ${otro}. Selecciona el perfil correcto.` });
   }
 
   const { password: _, ...sinPass } = usuario;

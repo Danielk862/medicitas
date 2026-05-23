@@ -53,13 +53,18 @@ Luego abre en tu navegador:
 http://localhost:3000
 ```
 
-### 👤 Cuenta de prueba
+### 👤 Cuentas de prueba
 
-| Correo                     | Contraseña      |
-|----------------------------|-----------------|
-| maria.gomez@correo.com     | Medicitas2026   |
+| Perfil   | Correo                          | Contraseña    |
+|----------|---------------------------------|---------------|
+| Paciente | maria.gomez@correo.com          | Medicitas2026 |
+| Médico   | laura.restrepo@medicitas.com    | Medicitas2026 |
 
-También puedes crear una cuenta nueva desde la pantalla de **Registro**.
+Al iniciar sesión (o registrarte) debes elegir el **tipo de perfil**:
+- **Paciente**: agenda, reprograma, cancela y consulta el historial de sus citas.
+- **Médico**: solo ve y configura **su propia** disponibilidad y su agenda del día.
+
+También puedes crear una cuenta nueva desde la pantalla de **Registro** eligiendo el tipo de perfil.
 
 ---
 
