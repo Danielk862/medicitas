@@ -154,8 +154,53 @@ app.post('/api/registro', (req, res) => {
   const perfil = tipo === 'medico' ? 'medico' : 'paciente';
 
   const usuarios = leer('usuarios.json');
-  if (usuarios.some(u => u.email.toLowerCase() === email.toLowerCase())) {
-    return res.status(409).json({ error: 'Ya existe una cuenta con este correo.' });
+  if (usuarios.some(u => u.email.toLowerCase() === email.toLowerCase() && u.tipo === perfil)) {
+    const cual = perfil === 'medico' ? 'médico' : 'paciente';
+    return res.status(409).json({ error: `Ya existe una cuenta de ${cual} con este correo.` });
+  }
+
+  let medicoIdFinal = medicoId || null;
+
+  if (perfil === 'medico') {
+    const medicos = leer('medicos.json');
+    const especialidades = leer('especialidades.json');
+
+    /* ID único basado en iniciales */
+    const base = ((nombre[0] || 'x') + (apellido[0] || 'x')).toLowerCase().replace(/[^a-z]/g, 'x');
+    let nuevoId = base;
+    let n = 2;
+    while (medicos.some(m => m.id === nuevoId)) { nuevoId = base + n; n++; }
+    medicoIdFinal = nuevoId;
+
+    const esp = especialidades.find(e => e.id === especialidad);
+    const espNombre = esp ? esp.nombre : (especialidad || 'General');
+
+    medicos.push({
+      id: medicoIdFinal,
+      nombre: `Dr. ${nombre} ${apellido}`,
+      iniciales: ((nombre[0] || '?') + (apellido[0] || '?')).toUpperCase(),
+      avatar: (medicos.length % 4) + 1,
+      especialidadId: especialidad || 'medicina-interna',
+      especialidad: espNombre,
+      universidad: '',
+      rating: 0,
+      resenas: 0,
+      experiencia: 0,
+      precio: 100000,
+      sede: 'El Poblado',
+      direccion: 'Cra. 43A #16-50'
+    });
+    escribir('medicos.json', medicos);
+
+    /* Agenda con todas las franjas habilitadas por defecto */
+    const agendas = leer('agendas.json');
+    const horasDefault = [...HORARIOS_MANANA, ...HORARIOS_TARDE];
+    agendas[medicoIdFinal] = {
+      lunes: [...horasDefault], martes: [...horasDefault],
+      miercoles: [...horasDefault], jueves: [...horasDefault],
+      viernes: [...horasDefault]
+    };
+    escribir('agendas.json', agendas);
   }
 
   const nuevo = {
@@ -166,7 +211,7 @@ app.post('/api/registro', (req, res) => {
     email,
     password,
     tipo: perfil,
-    medicoId: perfil === 'medico' ? (medicoId || null) : null,
+    medicoId: perfil === 'medico' ? medicoIdFinal : null,
     especialidad: perfil === 'medico' ? (especialidad || null) : null,
     creadoEn: new Date().toISOString()
   };

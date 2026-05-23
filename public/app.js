@@ -192,7 +192,7 @@ function renderHeaders(activo) {
 const SCREEN_TITLES = { 4: 'Inicio', 5: 'Especialidades', 6: 'Especialidades', 7: 'Especialidades', 8: 'Especialidades', 9: 'Inicio', 10: 'Mis citas', 11: 'Panel médico' };
 
 function requiereSesion(num) {
-  return num >= 4 && !App.usuario;
+  return num >= 4 && num !== 12 && !App.usuario;
 }
 
 function showScreen(num) {
@@ -205,7 +205,7 @@ function showScreen(num) {
 
   /* Control de acceso por rol (solo con sesión iniciada) */
   if (App.usuario) {
-    if (esMedico() && num >= 4 && num !== 11) {
+    if (esMedico() && num >= 4 && num !== 11 && num !== 12) {
       /* El médico solo usa su panel */
       num = 11;
     }
@@ -224,7 +224,7 @@ function showScreen(num) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (num === 3) resetLoginForm();
-  if (num >= 4) renderHeaders(SCREEN_TITLES[num] || '');
+  if (num >= 4 && num !== 12) renderHeaders(SCREEN_TITLES[num] || '');
 
   /* Cargar datos según la pantalla */
   if (num === 4) cargarDashboard();
@@ -248,7 +248,7 @@ document.addEventListener('keydown', (e) => {
   const active = document.querySelector('.screen-wrap.active');
   if (!active) return;
   const current = parseInt(active.id.replace('screen-', ''));
-  if (e.key === 'ArrowRight' && current < 11) showScreen(current + 1);
+  if (e.key === 'ArrowRight' && current < 12) showScreen(current + 1);
   if (e.key === 'ArrowLeft' && current > 1) showScreen(current - 1);
 });
 
@@ -1096,6 +1096,24 @@ async function cargarCitasMedico() {
       </div>`).join('');
   } catch (err) { cont.innerHTML = `<div class="empty-state"><p>${err.message}</p></div>`; }
 }
+
+/* ================================================================== */
+/*  CONTACTO                                                           */
+/* ================================================================== */
+document.getElementById('contact-submit').addEventListener('click', function () {
+  const nombre = document.getElementById('contact-nombre').value.trim();
+  const correo = document.getElementById('contact-correo').value.trim();
+  const mensaje = document.getElementById('contact-mensaje').value.trim();
+  if (!nombre || !correo || !mensaje) {
+    toast('Campos incompletos', 'Por favor completa todos los campos del formulario.', 'info');
+    return;
+  }
+  document.getElementById('contact-nombre').value = '';
+  document.getElementById('contact-correo').value = '';
+  document.getElementById('contact-asunto').value = '';
+  document.getElementById('contact-mensaje').value = '';
+  toast('¡Mensaje enviado!', 'Nos comunicaremos contigo en menos de 24 horas. Gracias.', 'ok');
+});
 
 /* ================================================================== */
 /*  INICIALIZACIÓN                                                     */

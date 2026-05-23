@@ -166,5 +166,31 @@
     "tipo": "medico",
     "medicoId": "av",
     "creadoEn": "2026-05-01T09:00:00.000Z"
+  },
+  {
+    "id": "u-1779555284132",
+    "nombre": "Daniel Andres",
+    "apellido": "Gomez",
+    "identificacion": "1037571662",
+    "telefono": "3245702742",
+    "email": "slipdany@hotmail.com",
+    "password": "Daniel2021*",
+    "tipo": "paciente",
+    "medicoId": null,
+    "especialidad": null,
+    "creadoEn": "2026-05-23T16:54:44.132Z"
+  },
+  {
+    "id": "u-1779555317604",
+    "nombre": "Daniel Andres",
+    "apellido": "Gomez",
+    "identificacion": "1037571662",
+    "telefono": "3245702742",
+    "email": "slipdany@hotmail.com",
+    "password": "Daniel2021*",
+    "tipo": "medico",
+    "medicoId": "dg",
+    "especialidad": "pediatria",
+    "creadoEn": "2026-05-23T16:55:17.604Z"
   }
 ]
