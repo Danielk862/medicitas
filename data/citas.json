@@ -17,5 +17,24 @@
     "precio": 120000,
     "estado": "confirmada",
     "creadoEn": "2026-05-10T14:20:00.000Z"
+  },
+  {
+    "id": "MED-2026-LTPB7",
+    "usuarioId": "u-maria",
+    "medicoId": "jg",
+    "medicoNombre": "Dra. Johana Galvis",
+    "medicoIniciales": "JG",
+    "especialidad": "Cardiología",
+    "universidad": "Pontificia Bolivariana",
+    "experiencia": 15,
+    "fecha": "2026-05-25",
+    "hora": "7:30 AM",
+    "duracion": 30,
+    "modalidad": "Presencial",
+    "sede": "El Poblado",
+    "direccion": "Cra. 43A #16-50",
+    "precio": 130000,
+    "estado": "confirmada",
+    "creadoEn": "2026-05-23T17:25:08.566Z"
   }
 ]

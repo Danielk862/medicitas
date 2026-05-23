@@ -69,7 +69,7 @@ Contraseña para todas las cuentas: **`Medicitas2026`**
 |-------------------------|--------------------|-------------------------------------|
 | Dra. Laura Restrepo     | Cardiología        | laura.restrepo@medicitas.com        |
 | Dr. Carlos Mejía        | Cardiología        | carlos.mejia@medicitas.com          |
-| Dra. Ana Salazar        | Cardiología        | ana.salazar@medicitas.com           |
+| Dra. Johana Galvis      | Cardiología        | johana.galvis@medicitas.com         |
 | Dr. Julián Bedoya       | Cardiología        | julian.bedoya@medicitas.com         |
 | Dra. Marcela Patiño     | Oftalmología       | marcela.patino@medicitas.com        |
 | Dr. Ricardo Henao       | Oftalmología       | ricardo.henao@medicitas.com         |

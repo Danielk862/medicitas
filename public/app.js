@@ -130,6 +130,21 @@ function cargarSesion() {
     if (u) App.usuario = JSON.parse(u);
   } catch (e) {}
 }
+function resetRegForm() {
+  ['reg-nombre','reg-apellido','reg-identificacion','reg-telefono','reg-email','reg-password'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('reg-especialidad').value = '';
+  document.getElementById('reg-especialidad-group').style.display = 'none';
+  document.getElementById('reg-terms').checked = false;
+  document.getElementById('reg-strength').className = 'password-strength';
+  ocultarMensaje('reg-msg');
+  App.regTipo = 'paciente';
+  document.querySelectorAll('[data-reg-tipo]').forEach(b => {
+    b.classList.toggle('active', b.dataset.regTipo === 'paciente');
+  });
+}
+
 function resetLoginForm() {
   document.getElementById('login-email').value = '';
   document.getElementById('login-password').value = '';
@@ -142,6 +157,7 @@ function resetLoginForm() {
 
 function cerrarSesion() {
   App.usuario = null;
+  _medListaMedicos = [];
   try { sessionStorage.removeItem('medicitas_user'); } catch (e) {}
   resetLoginForm();
   showScreen(1);
@@ -223,6 +239,7 @@ function showScreen(num) {
   });
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
+  if (num === 2) resetRegForm();
   if (num === 3) resetLoginForm();
   if (num >= 4 && num !== 12) renderHeaders(SCREEN_TITLES[num] || '');
 
@@ -1037,7 +1054,10 @@ async function onMedicoChange() {
   renderMedSlots();
 }
 
-function medActualId() { return document.getElementById('med-select').value; }
+function medActualId() {
+  if (esMedico() && App.usuario && App.usuario.medicoId) return App.usuario.medicoId;
+  return document.getElementById('med-select').value;
+}
 
 async function cargarAgendaMedico() {
   const { agenda } = await api(`/api/agenda/${medActualId()}`);
@@ -1047,8 +1067,8 @@ async function cargarAgendaMedico() {
   });
 }
 
-const HORARIOS_MANANA = ['8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM'];
-const HORARIOS_TARDE = ['2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM', '5:00 PM', '5:30 PM'];
+const HORARIOS_MANANA = ['7:00 AM', '7:30 AM', '8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM'];
+const HORARIOS_TARDE  = ['1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM', '5:00 PM', '5:30 PM', '6:00 PM', '6:30 PM', '7:00 PM'];
 
 function renderMedSlots() {
   const dia = document.getElementById('med-dia').value;
