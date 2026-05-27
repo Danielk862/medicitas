@@ -7,7 +7,7 @@ aplicación **completamente funcional**, con persistencia real de datos en
 
 ---
 
-## ✅ ¿Qué hace?
+## ¿Qué hace?
 
 Cubre las historias de usuario de los **Sprints 1 y 2**:
 
@@ -32,7 +32,7 @@ Se conserva íntegramente el sistema de diseño del Sprint 1.
 
 ---
 
-## 🚀 Cómo ejecutarlo
+## Cómo ejecutarlo
 
 Requisito: tener **Node.js 18 o superior** instalado.
 
@@ -53,7 +53,7 @@ Luego abre en tu navegador:
 http://localhost:3000
 ```
 
-### 👤 Cuentas de prueba
+### Cuentas de prueba
 
 Contraseña para todas las cuentas: **`Medicitas2026`**
 
@@ -89,7 +89,7 @@ También puedes crear una cuenta nueva desde la pantalla de **Registro** eligien
 
 ---
 
-## 📁 Estructura del proyecto
+## Estructura del proyecto
 
 ```
 medicitas/
@@ -109,7 +109,7 @@ medicitas/
 
 ---
 
-## 🔌 API REST (resumen)
+## API REST (resumen)
 
 | Método | Ruta                                | Descripción                         |
 |--------|-------------------------------------|-------------------------------------|
@@ -131,7 +131,7 @@ de modo que **los datos sobreviven al reinicio del servidor**.
 
 ---
 
-## 🧪 Navegación del prototipo
+## Navegación del prototipo
 
 La barra superior negra permite saltar entre las 10 pantallas para revisión.
 También puedes navegar con las flechas ← → del teclado.
